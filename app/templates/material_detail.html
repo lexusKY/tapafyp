@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Material Detail - TAPA{% endblock %}
+
+{% block content %}
+    <h2>{{ material.title }}</h2>
+    <p><strong>Filename:</strong> {{ material.filename }}</p>
+
+    <h3>Extracted Text</h3>
+
+    {% if material.extracted_text %}
+        <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 15px; max-height: 500px; overflow-y: auto;">
+            {{ material.extracted_text }}
+        </div>
+    {% else %}
+        <p>No text extracted from this PDF.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - TAPA{% endblock %}
+
+{% block content %}
+    <h2>Dashboard</h2>
+    <p>Welcome, {{ user.username }}.</p>
+    <p>This is your dashboard.</p>
+
+    <p>
+        <a href="{{ url_for('main.upload') }}">Upload Past Year Exam PDF</a>
+    </p>
+
+    <h3>Uploaded Materials</h3>
+
+    {% if materials %}
+        <ul>
+            {% for material in materials %}
+                <li>
+                    <strong>{{ material.title }}</strong> - {{ material.filename }}
+                    |
+                    <a href="{{ url_for('main.view_material', material_id=material.id) }}">View Extracted Text</a>
+                    |
+                    <a href="{{ url_for('main.quiz', material_id=material.id) }}">View Quiz</a>
+
+                    <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}" style="display:inline;">
+                        <button type="submit">Generate Interactive Quiz</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No uploaded materials yet.</p>
+    {% endif %}
+{% endblock %}

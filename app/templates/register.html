@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Register - TAPA{% endblock %}
+
+{% block content %}
+    <h2>Register</h2>
+
+    <form method="POST">
+        <div style="margin-bottom: 10px;">
+            <label for="username">Username</label><br>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="email">Email</label><br>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label for="confirm_password">Confirm Password</label><br>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+        </div>
+
+        <button type="submit">Register</button>
+    </form>
+{% endblock %}
