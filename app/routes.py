@@ -1,6 +1,6 @@
 import os
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash
+from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, session
 from flask_login import login_required, current_user
 
 from app import db
@@ -179,15 +179,109 @@ def generate_quiz(material_id):
     db.session.commit()
 
     flash("Interactive quiz generated successfully.", "success")
-    return redirect(url_for("main.quiz", material_id=material.id))
+    return redirect(url_for("main.start_quiz", material_id=material.id))
 
 
-@main.route("/quiz/<int:material_id>")
+@main.route("/start-quiz/<int:material_id>")
 @login_required
-def quiz(material_id):
+def start_quiz(material_id):
     material = Material.query.get_or_404(material_id)
-    questions = Question.query.filter_by(material_id=material.id).all()
-    return render_template("quiz.html", material=material, questions=questions)
+    questions = Question.query.filter_by(material_id=material.id).order_by(Question.id.asc()).all()
+
+    if not questions:
+        flash("No quiz questions generated yet.", "warning")
+        return redirect(url_for("main.dashboard"))
+
+    session[f"quiz_{material_id}_answers"] = {}
+    return redirect(url_for("main.quiz_question", material_id=material.id, question_number=1))
+
+
+@main.route("/quiz/<int:material_id>/<int:question_number>", methods=["GET", "POST"])
+@login_required
+def quiz_question(material_id, question_number):
+    material = Material.query.get_or_404(material_id)
+    questions = Question.query.filter_by(material_id=material.id).order_by(Question.id.asc()).all()
+
+    if not questions:
+        flash("No quiz questions found.", "warning")
+        return redirect(url_for("main.dashboard"))
+
+    total_questions = len(questions)
+
+    if question_number < 1 or question_number > total_questions:
+        return redirect(url_for("main.quiz_result", material_id=material.id))
+
+    current_question = questions[question_number - 1]
+    session_key = f"quiz_{material_id}_answers"
+    answers = session.get(session_key, {})
+
+    if request.method == "POST":
+        selected_choice_id = request.form.get("selected_choice")
+
+        if not selected_choice_id:
+            flash("Please select an answer before continuing.", "warning")
+            return redirect(url_for("main.quiz_question", material_id=material.id, question_number=question_number))
+
+        answers[str(current_question.id)] = int(selected_choice_id)
+        session[session_key] = answers
+
+        next_question_number = question_number + 1
+
+        if next_question_number > total_questions:
+            return redirect(url_for("main.quiz_result", material_id=material.id))
+
+        return redirect(url_for("main.quiz_question", material_id=material.id, question_number=next_question_number))
+
+    selected_answer = answers.get(str(current_question.id))
+
+    return render_template(
+        "quiz_question.html",
+        material=material,
+        question=current_question,
+        question_number=question_number,
+        total_questions=total_questions,
+        selected_answer=selected_answer       
+    )
+
+
+@main.route("/quiz-result/<int:material_id>")
+@login_required
+def quiz_result(material_id):
+    material = Material.query.get_or_404(material_id)
+    questions = Question.query.filter_by(material_id=material.id).order_by(Question.id.asc()).all()
+
+    session_key = f"quiz_{material_id}_answers"
+    answers = session.get(session_key, {})
+
+    score = 0
+    results = []
+
+    for question in questions:
+        correct_choice = Choice.query.filter_by(question_id=question.id, is_correct=True).first()
+        selected_choice_id = answers.get(str(question.id))
+        selected_choice = Choice.query.get(selected_choice_id) if selected_choice_id else None
+
+        is_correct = selected_choice is not None and correct_choice is not None and selected_choice.id == correct_choice.id
+
+        if is_correct:
+            score += 1
+
+        results.append({
+            "question": question,
+            "selected_choice": selected_choice,
+            "correct_choice": correct_choice,
+            "is_correct": is_correct
+        })
+
+    total_questions = len(questions)
+
+    return render_template(
+        "quiz_result.html",
+        material=material,
+        score=score,
+        total_questions=total_questions,
+        results=results
+    )
 
 
 @main.route("/course-style")

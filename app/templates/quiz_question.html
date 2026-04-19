@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - TAPA{% endblock %}
+
+{% block content %}
+    <h2>{{ material.title }}</h2>
+    <p>Question {{ question_number }} of {{ total_questions }}</p>
+
+    <progress value="{{ question_number }}" max="{{ total_questions }}" style="width: 100%; max-width: 700px; height: 18px;"></progress>
+
+    <form method="POST">
+        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 10px; max-width: 700px; margin-top: 20px;">
+            <h3>{{ question.question_text }}</h3>
+            <p>Difficulty: {{ question.difficulty }}</p>
+
+            {% for choice in question.choices %}
+                <div style="margin: 12px 0;">
+                    <label style="display: block; padding: 10px; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;">
+                        <input
+                            type="radio"
+                            name="selected_choice"
+                            value="{{ choice.id }}"
+                            {% if selected_answer == choice.id %}checked{% endif %}
+                        >
+                        {{ choice.choice_text }}
+                    </label>
+                </div>
+            {% endfor %}
+
+            <button type="submit" style="margin-top: 15px;">Next</button>
+        </div>
+    </form>
+{% endblock %}

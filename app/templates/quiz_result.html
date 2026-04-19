@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result - TAPA{% endblock %}
+
+{% block content %}
+    <h2>Quiz Result</h2>
+    <p><strong>{{ material.title }}</strong></p>
+    <p>Your score: <strong>{{ score }}/{{ total_questions }}</strong></p>
+
+    <hr>
+
+    {% for item in results %}
+        <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 10px;">
+            <h3>Q{{ loop.index }}. {{ item.question.question_text }}</h3>
+
+            <p>
+                Your answer:
+                <strong>
+                    {% if item.selected_choice %}
+                        {{ item.selected_choice.choice_text }}
+                    {% else %}
+                        No answer selected
+                    {% endif %}
+                </strong>
+            </p>
+
+            <p>
+                Correct answer:
+                <strong>{{ item.correct_choice.choice_text if item.correct_choice else 'N/A' }}</strong>
+            </p>
+
+            <p>
+                Result:
+                {% if item.is_correct %}
+                    <strong style="color: green;">Correct</strong>
+                {% else %}
+                    <strong style="color: red;">Wrong</strong>
+                {% endif %}
+            </p>
+        </div>
+    {% endfor %}
+
+    <a href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+{% endblock %}
