@@ -31,6 +31,15 @@ def load_style_profile(course_code, base_path):
         return f.read().strip()
 
 
+def get_filtered_questions(material_id, level):
+    query = Question.query.filter_by(material_id=material_id)
+
+    if level and level != "All":
+        query = query.filter_by(difficulty=level)
+
+    return query.order_by(Question.id.asc()).all()
+
+
 @main.route("/")
 def index():
     return render_template("index.html")
@@ -179,28 +188,53 @@ def generate_quiz(material_id):
     db.session.commit()
 
     flash("Interactive quiz generated successfully.", "success")
-    return redirect(url_for("main.start_quiz", material_id=material.id))
+    return redirect(url_for("main.choose_level", material_id=material.id))
 
 
-@main.route("/start-quiz/<int:material_id>")
+@main.route("/choose-level/<int:material_id>")
 @login_required
-def start_quiz(material_id):
+def choose_level(material_id):
     material = Material.query.get_or_404(material_id)
-    questions = Question.query.filter_by(material_id=material.id).order_by(Question.id.asc()).all()
+    questions = Question.query.filter_by(material_id=material.id).all()
 
     if not questions:
         flash("No quiz questions generated yet.", "warning")
         return redirect(url_for("main.dashboard"))
 
-    session[f"quiz_{material_id}_answers"] = {}
-    return redirect(url_for("main.quiz_question", material_id=material.id, question_number=1))
+    hot_count = Question.query.filter_by(material_id=material.id, difficulty="Hot").count()
+    moderate_count = Question.query.filter_by(material_id=material.id, difficulty="Moderate").count()
+    cold_count = Question.query.filter_by(material_id=material.id, difficulty="Cold").count()
+    all_count = len(questions)
+
+    return render_template(
+        "choose_level.html",
+        material=material,
+        hot_count=hot_count,
+        moderate_count=moderate_count,
+        cold_count=cold_count,
+        all_count=all_count
+    )
 
 
-@main.route("/quiz/<int:material_id>/<int:question_number>", methods=["GET", "POST"])
+@main.route("/start-quiz/<int:material_id>/<level>")
 @login_required
-def quiz_question(material_id, question_number):
+def start_quiz(material_id, level):
     material = Material.query.get_or_404(material_id)
-    questions = Question.query.filter_by(material_id=material.id).order_by(Question.id.asc()).all()
+    questions = get_filtered_questions(material.id, level)
+
+    if not questions:
+        flash(f"No {level} questions available for this quiz.", "warning")
+        return redirect(url_for("main.choose_level", material_id=material.id))
+
+    session[f"quiz_{material_id}_{level}_answers"] = {}
+    return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=1))
+
+
+@main.route("/quiz/<int:material_id>/<level>/<int:question_number>", methods=["GET", "POST"])
+@login_required
+def quiz_question(material_id, level, question_number):
+    material = Material.query.get_or_404(material_id)
+    questions = get_filtered_questions(material.id, level)
 
     if not questions:
         flash("No quiz questions found.", "warning")
@@ -209,10 +243,10 @@ def quiz_question(material_id, question_number):
     total_questions = len(questions)
 
     if question_number < 1 or question_number > total_questions:
-        return redirect(url_for("main.quiz_result", material_id=material.id))
+        return redirect(url_for("main.quiz_result", material_id=material.id, level=level))
 
     current_question = questions[question_number - 1]
-    session_key = f"quiz_{material_id}_answers"
+    session_key = f"quiz_{material_id}_{level}_answers"
     answers = session.get(session_key, {})
 
     if request.method == "POST":
@@ -220,7 +254,7 @@ def quiz_question(material_id, question_number):
 
         if not selected_choice_id:
             flash("Please select an answer before continuing.", "warning")
-            return redirect(url_for("main.quiz_question", material_id=material.id, question_number=question_number))
+            return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=question_number))
 
         answers[str(current_question.id)] = int(selected_choice_id)
         session[session_key] = answers
@@ -228,9 +262,9 @@ def quiz_question(material_id, question_number):
         next_question_number = question_number + 1
 
         if next_question_number > total_questions:
-            return redirect(url_for("main.quiz_result", material_id=material.id))
+            return redirect(url_for("main.quiz_result", material_id=material.id, level=level))
 
-        return redirect(url_for("main.quiz_question", material_id=material.id, question_number=next_question_number))
+        return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=next_question_number))
 
     selected_answer = answers.get(str(current_question.id))
 
@@ -240,17 +274,18 @@ def quiz_question(material_id, question_number):
         question=current_question,
         question_number=question_number,
         total_questions=total_questions,
-        selected_answer=selected_answer       
+        selected_answer=selected_answer,
+        level=level
     )
 
 
-@main.route("/quiz-result/<int:material_id>")
+@main.route("/quiz-result/<int:material_id>/<level>")
 @login_required
-def quiz_result(material_id):
+def quiz_result(material_id, level):
     material = Material.query.get_or_404(material_id)
-    questions = Question.query.filter_by(material_id=material.id).order_by(Question.id.asc()).all()
+    questions = get_filtered_questions(material.id, level)
 
-    session_key = f"quiz_{material_id}_answers"
+    session_key = f"quiz_{material_id}_{level}_answers"
     answers = session.get(session_key, {})
 
     score = 0
@@ -261,7 +296,11 @@ def quiz_result(material_id):
         selected_choice_id = answers.get(str(question.id))
         selected_choice = Choice.query.get(selected_choice_id) if selected_choice_id else None
 
-        is_correct = selected_choice is not None and correct_choice is not None and selected_choice.id == correct_choice.id
+        is_correct = (
+            selected_choice is not None and
+            correct_choice is not None and
+            selected_choice.id == correct_choice.id
+        )
 
         if is_correct:
             score += 1
@@ -280,7 +319,8 @@ def quiz_result(material_id):
         material=material,
         score=score,
         total_questions=total_questions,
-        results=results
+        results=results,
+        level=level
     )
 
 

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Level - TAPA{% endblock %}
+
+{% block content %}
+    <h2>Choose Your Quiz Level</h2>
+    <p><strong>{{ material.title }}</strong></p>
+    <p>Course: {{ material.course_code }}</p>
+
+    <div style="max-width: 700px; margin-top: 20px;">
+        <div style="margin-bottom: 15px;">
+            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='All') }}">
+                <button type="button">All ({{ all_count }})</button>
+            </a>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='Hot') }}">
+                <button type="button">Hot ({{ hot_count }})</button>
+            </a>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='Moderate') }}">
+                <button type="button">Moderate ({{ moderate_count }})</button>
+            </a>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='Cold') }}">
+                <button type="button">Cold ({{ cold_count }})</button>
+            </a>
+        </div>
+    </div>
+{% endblock %}

@@ -4,6 +4,7 @@
 
 {% block content %}
     <h2>{{ material.title }}</h2>
+    <p>Level: <strong>{{ level }}</strong></p>
     <p>Question {{ question_number }} of {{ total_questions }}</p>
 
     <progress value="{{ question_number }}" max="{{ total_questions }}" style="width: 100%; max-width: 700px; height: 18px;"></progress>

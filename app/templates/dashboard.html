@@ -23,7 +23,7 @@
                     |
                     <a href="{{ url_for('main.view_material', material_id=material.id) }}">View Extracted Text</a>
                     |
-                    <a href="{{ url_for('main.start_quiz', material_id=material.id) }}">Start Quiz</a>
+                    <a href="{{ url_for('main.choose_level', material_id=material.id) }}">Choose Level</a>
 
                     <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}" style="display:inline;">
                         <button type="submit">Generate Interactive Quiz</button>
