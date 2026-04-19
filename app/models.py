@@ -20,6 +20,7 @@ class Material(db.Model):
     __tablename__ = "materials"
 
     id = db.Column(db.Integer, primary_key=True)
+    course_code = db.Column(db.String(30), nullable=True)
     title = db.Column(db.String(200), nullable=False)
     filename = db.Column(db.String(255), nullable=False)
     extracted_text = db.Column(db.Text)

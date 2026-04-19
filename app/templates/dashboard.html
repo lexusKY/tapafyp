@@ -17,7 +17,9 @@
         <ul>
             {% for material in materials %}
                 <li>
-                    <strong>{{ material.title }}</strong> - {{ material.filename }}
+                    <strong>{{ material.course_code or 'NO CODE' }}</strong> -
+                    <strong>{{ material.title }}</strong> -
+                    {{ material.filename }}
                     |
                     <a href="{{ url_for('main.view_material', material_id=material.id) }}">View Extracted Text</a>
                     |

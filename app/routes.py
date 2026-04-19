@@ -11,12 +11,24 @@ from app.services.lecture_file_service import extract_text_from_file, combine_ex
 
 main = Blueprint("main", __name__)
 
-
 ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "html"}
 
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def load_style_profile(course_code, base_path):
+    if not course_code:
+        return None
+
+    profile_path = os.path.join(base_path, course_code.upper(), "style_profile.txt")
+
+    if not os.path.exists(profile_path):
+        return None
+
+    with open(profile_path, "r", encoding="utf-8") as f:
+        return f.read().strip()
 
 
 @main.route("/")
@@ -36,13 +48,17 @@ def dashboard():
 def upload():
     if request.method == "POST":
         title = request.form.get("title", "").strip()
+        course_code = request.form.get("course_code", "").strip().upper()
 
         if not title:
             flash("Please enter a title.", "danger")
             return redirect(url_for("main.upload"))
 
-        uploaded_files = request.files.getlist("note_files")
+        if not course_code:
+            flash("Please enter a course code.", "danger")
+            return redirect(url_for("main.upload"))
 
+        uploaded_files = request.files.getlist("note_files")
         valid_files = [f for f in uploaded_files if f and f.filename.strip()]
 
         if not valid_files:
@@ -83,6 +99,7 @@ def upload():
         combined_filename_text = ", ".join(saved_filenames)
 
         new_material = Material(
+            course_code=course_code,
             title=title,
             filename=combined_filename_text,
             extracted_text=combined_text
@@ -118,6 +135,11 @@ def generate_quiz(material_id):
         flash("Gemini API key is missing.", "danger")
         return redirect(url_for("main.dashboard"))
 
+    style_profile_text = load_style_profile(
+        material.course_code,
+        current_app.config["PAST_PAPERS_FOLDER"]
+    )
+
     old_questions = Question.query.filter_by(material_id=material.id).all()
 
     for question in old_questions:
@@ -126,7 +148,12 @@ def generate_quiz(material_id):
     Question.query.filter_by(material_id=material.id).delete()
     db.session.commit()
 
-    generated_questions = generate_mcqs_from_text(material.extracted_text, gemini_api_key)
+    generated_questions = generate_mcqs_from_text(
+        material.extracted_text,
+        gemini_api_key,
+        course_code=material.course_code,
+        style_profile_text=style_profile_text
+    )
 
     if not generated_questions:
         flash("Failed to generate quiz questions.", "danger")

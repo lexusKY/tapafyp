@@ -23,9 +23,7 @@ Your task:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=[uploaded_file, prompt],
-            config=types.GenerateContentConfig(
-                temperature=0
-            )
+            config=types.GenerateContentConfig(temperature=0)
         )
 
         if response.text:
@@ -38,31 +36,40 @@ Your task:
         return None
 
 
-def generate_mcqs_from_text(extracted_text, api_key):
+def generate_mcqs_from_text(extracted_text, api_key, course_code=None, style_profile_text=None):
     try:
         client = genai.Client(api_key=api_key)
 
-        shortened_text = extracted_text[:12000]
+        shortened_text = extracted_text[:15000]
+        style_profile_text = (style_profile_text or "")[:12000]
 
         prompt = f"""
-You are helping build an educational quiz system.
+You are helping build TAPA, an educational revision quiz system.
 
-Based on the exam text below, generate 5 original multiple-choice questions for student revision.
+Generate 5 original multiple-choice questions based on the student's uploaded lecture notes.
+
+Course code:
+{course_code or "Unknown"}
+
+Course style profile:
+{style_profile_text if style_profile_text else "No style profile provided."}
+
+Lecture notes text:
+{shortened_text}
 
 Rules:
-1. Base the questions on the uploaded exam content.
-2. Keep the questions clear and suitable for revision.
-3. Each question must have exactly 4 answer choices.
-4. Only 1 choice must be correct.
-5. Include a difficulty level using only one of these values:
-   - Hot
-   - Moderate
-   - Cold
-6. Return valid JSON only.
-7. Do not use markdown fences.
-8. Do not add explanations before or after the JSON.
+1. Base the questions on the uploaded lecture notes.
+2. If a course style profile is provided, follow its tone, difficulty pattern, and question style.
+3. Do not copy past year exam questions exactly.
+4. Make the questions suitable for student revision in UTAR-like style.
+5. Each question must have exactly 4 choices.
+6. Only 1 choice must be correct.
+7. Include difficulty using only: Hot, Moderate, Cold.
+8. Return valid JSON only.
+9. Do not use markdown fences.
+10. Do not include explanations before or after the JSON.
 
-Return this exact JSON structure:
+Return this exact JSON format:
 [
   {{
     "question_text": "string",
@@ -75,9 +82,6 @@ Return this exact JSON structure:
     ]
   }}
 ]
-
-Exam text:
-{shortened_text}
 """
 
         response = client.models.generate_content(
@@ -107,8 +111,7 @@ Exam text:
         if cleaned_text.endswith("```"):
             cleaned_text = cleaned_text[:-3].strip()
 
-        questions = json.loads(cleaned_text)
-        return questions
+        return json.loads(cleaned_text)
 
     except Exception as e:
         print(f"Gemini MCQ generation error: {e}")
@@ -180,15 +183,6 @@ Course Code: {course_code}
 - ...
 - ...
 - ...
-
-Instructions:
-- Focus mainly on the most recent papers provided.
-- Summarize the paper style, not every single question.
-- Be specific and practical.
-- If coding is important, say so clearly.
-- If theory is important, say so clearly.
-- If screenshots, UI tasks, multi-file structure, navigation, state handling, reusable components, or similar patterns appear, mention them.
-- Keep each bullet short and useful.
 
 Exam papers text:
 {shortened_text}
