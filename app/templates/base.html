@@ -12,6 +12,7 @@
 
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.dashboard') }}" style="margin-left: 15px;">Dashboard</a>
+            <a href="{{ url_for('main.course_style_page') }}" style="margin-left: 15px;">Course Style</a>
             <a href="{{ url_for('auth.logout') }}" style="margin-left: 15px;">Logout</a>
         {% else %}
             <a href="{{ url_for('auth.login') }}" style="margin-left: 15px;">Login</a>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Course Style Profile - TAPA{% endblock %}
+
+{% block content %}
+    <h2>Course Style Profile Generator</h2>
+
+    <form method="POST" action="{{ url_for('main.generate_style_profile_route') }}">
+        <div style="margin-bottom: 10px;">
+            <label for="course_code">Course Code</label><br>
+            <input type="text" id="course_code" name="course_code" placeholder="Example: UECS3253" required>
+        </div>
+
+        <button type="submit">Generate Style Profile</button>
+    </form>
+
+    <hr>
+
+    <p>After generating, you can open it manually from:</p>
+    <p><code>past_papers/&lt;COURSE_CODE&gt;/style_profile.txt</code></p>
+{% endblock %}

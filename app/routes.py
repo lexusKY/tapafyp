@@ -1,12 +1,13 @@
 import os
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash
+from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, send_file
 from flask_login import login_required, current_user
 
 from app import db
 from app.models import Material, Question, Choice
 from app.services.pdf_service import extract_text_from_pdf
 from app.services.ai_service import extract_text_with_gemini, generate_mcqs_from_text
+from app.services.course_profile_service import build_style_profile_for_course
 
 main = Blueprint("main", __name__)
 
@@ -153,3 +154,59 @@ def quiz(material_id):
     material = Material.query.get_or_404(material_id)
     questions = Question.query.filter_by(material_id=material.id).all()
     return render_template("quiz.html", material=material, questions=questions)
+
+
+@main.route("/course-style")
+@login_required
+def course_style_page():
+    return render_template("course_style.html")
+
+
+@main.route("/generate-style-profile", methods=["POST"])
+@login_required
+def generate_style_profile_route():
+    course_code = request.form.get("course_code", "").strip().upper()
+
+    if not course_code:
+        flash("Please enter a course code.", "danger")
+        return redirect(url_for("main.course_style_page"))
+
+    gemini_api_key = current_app.config.get("GEMINI_API_KEY")
+    if not gemini_api_key:
+        flash("Gemini API key is missing.", "danger")
+        return redirect(url_for("main.course_style_page"))
+
+    base_path = current_app.config["PAST_PAPERS_FOLDER"]
+
+    success, result = build_style_profile_for_course(course_code, base_path, gemini_api_key)
+
+    if success:
+        flash(f"Style profile generated successfully for {course_code}.", "success")
+    else:
+        flash(result, "danger")
+
+    return redirect(url_for("main.course_style_page"))
+
+
+@main.route("/view-style-profile/<course_code>")
+@login_required
+def view_style_profile(course_code):
+    course_code = course_code.upper()
+    profile_path = os.path.join(
+        current_app.config["PAST_PAPERS_FOLDER"],
+        course_code,
+        "style_profile.txt"
+    )
+
+    if not os.path.exists(profile_path):
+        flash("Style profile file not found.", "warning")
+        return redirect(url_for("main.course_style_page"))
+
+    with open(profile_path, "r", encoding="utf-8") as f:
+        profile_text = f.read()
+
+    return render_template(
+        "style_profile_view.html",
+        course_code=course_code,
+        profile_text=profile_text
+    )

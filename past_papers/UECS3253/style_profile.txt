@@ -1,0 +1,74 @@
+Course Code: UECS3253
+
+1. Common Exam Format
+- Two sections: Section A (2 questions, compulsory), Section B (2 questions, answer only 1).
+- Section A questions carry 30 marks each.
+- Section B questions carry 40 marks each.
+- Total marks: 100.
+- Exam duration: 2 hours.
+- Only the first answered question in Section B will be marked if more than one is attempted.
+
+2. Common Question Types
+- Identification: Specific terms, types, features, commands, HTTP status codes, errors.
+- Definition and Explanation: Concepts, differences, justifications, effects of code segments.
+- Listing: Features, frameworks, use cases, methods.
+- Construction/Completion of Code: React Native components, data storage operations (SQLite, AsyncStorage), API calls (Fetch, Socket.IO), device access (Geolocation), installation commands.
+- Scenario-based Problem Solving: Applying knowledge to develop functionalities for a given application, often involving multiple steps (e.g., sending data, handling response, UI feedback, navigation).
+- Comparison/Differentiation: Between concepts (e.g., class vs functional components, API vs web services, lifecycle methods).
+
+3. Common Topics / Repeated Focus
+- Mobile application types (native, web, hybrid) and their characteristics.
+- Android OS architecture, features, and development tools (React Native).
+- React Native core concepts: Components (class vs functional), state management (useState), props, React Hooks, lifecycle methods, component export/import.
+- Persistent data storage: SQLite (react-native-sqlite-storage) and AsyncStorage.
+- Device hardware access: Geolocation API, PermissionsAndroid for location.
+- Web services and APIs: RESTful APIs, HTTP methods (GET, PUT, DELETE), HTTP status codes, Fetch API, Axios.
+- Real-time communication: WebSockets and Socket.IO (socket.io-client).
+- UI feedback mechanisms: ToastAndroid, Alert.
+- Navigation in React Native applications, including passing route parameters.
+- Server-side integration concepts (e.g., Flask server mentioned in scenarios).
+
+4. Common Command Words
+- Identify, State, Describe, Explain, Construct, Analyse, Define, Provide, Give, Compare, Re-implement, Complete.
+- "Construct the code" and "Describe the effect of the code" are very frequent for practical questions.
+- "Identify" is used for specific facts, names, or components.
+- "Explain" and "Analyse" are used for conceptual understanding and justifications.
+
+5. Answer Style Expected
+- For theoretical questions: Concise and accurate definitions, clear and logical explanations, specific examples, and justifications when required.
+- For coding questions: Correct, complete, and syntactically accurate code segments, often filling in blanks within a provided skeleton. Code should demonstrate proper use of relevant libraries and React Native patterns.
+- For scenario-based questions: A comprehensive solution that integrates theoretical knowledge with practical coding, addressing all specified requirements including data handling, error management, UI feedback, and navigation.
+- Specific commands (e.g., installation) should be exact.
+
+6. Difficulty Pattern
+- Section A: Focuses on foundational knowledge, basic definitions, identification, and smaller, more direct coding tasks or code analysis. Marks per sub-question are generally lower.
+- Section B: Features complex, multi-part scenario-based problems that require integrating several concepts and significant coding. These questions demand a deeper application of knowledge and problem-solving skills, with higher marks per sub-question.
+- Overall: A balanced mix of theoretical recall and practical application, with a strong emphasis on hands-on React Native development.
+
+7. Coding Question Pattern
+- Strong emphasis on React Native framework and its ecosystem.
+- Frequent "Construct the code" or "Complete the code here" within provided code snippets or function bodies.
+- Involves specific React Native libraries: react-native-sqlite-storage, AsyncStorage, Geolocation API, Fetch API, socket.io-client, PermissionsAndroid, ToastAndroid, Alert.
+- Covers: React Native component creation (functional and class), state management (useState), props, hooks, data persistence (CRUD operations for SQLite, key-value operations for AsyncStorage), API integration (HTTP requests, JSON data handling, error handling), real-time communication (WebSocket connection, event listeners, emitting data), and device feature access (location permissions, retrieving position).
+- Often requires implementing UI feedback (Toast, Alert) and navigation logic (navigate to screen, navigate back, pass parameters) as part of the solution.
+- Includes tasks like installing modules via command line and identifying/correcting syntax errors.
+
+8. UI / Practical Pattern
+- UI elements (TextInput, Button, ScrollView) are part of the provided code skeletons for completion.
+- UI feedback mechanisms (ToastAndroid, Alert) are consistently required for success/failure/error handling.
+- Navigation (e.g., `navigation.navigate`, `navigation.goBack`) is a critical component of practical scenarios, often with route parameter passing.
+- State handling using `useState` is fundamental to almost all practical React Native questions.
+- Device hardware access, specifically GPS/location services, is a recurring practical topic.
+- Screenshots or UI design tasks are not explicitly required.
+- Multi-file structure is implied through import/export statements but not directly tested as a task.
+- Reusable components are mentioned (e.g., `CustomComponent`).
+
+9. Notes for AI Question Generation
+- Generate questions that test both theoretical understanding and practical React Native coding skills.
+- Create multi-part, scenario-based problems for Section B that integrate several topics (e.g., API calls, data storage, state management, UI feedback, navigation).
+- Provide code skeletons for coding questions, requiring students to complete specific sections.
+- Ensure coverage of core React Native concepts (components, state, hooks) and key libraries (SQLite, AsyncStorage, Fetch, Socket.IO, Geolocation, PermissionsAndroid).
+- Include questions on HTTP methods, status codes, and web service/API concepts.
+- Vary command words to test different cognitive levels (Identify, Explain, Construct, Describe, Define, Analyse).
+- Emphasize error handling, success/failure scenarios, and appropriate UI feedback (Toast, Alert) in practical coding tasks.
+- Include questions that require specific installation commands or differentiate between similar concepts (e.g., class vs functional components, API vs web services).

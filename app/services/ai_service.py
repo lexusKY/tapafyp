@@ -22,10 +22,7 @@ Your task:
 
         response = client.models.generate_content(
             model="gemini-2.5-flash",
-            contents=[
-                uploaded_file,
-                prompt
-            ],
+            contents=[uploaded_file, prompt],
             config=types.GenerateContentConfig(
                 temperature=0
             )
@@ -115,4 +112,101 @@ Exam text:
 
     except Exception as e:
         print(f"Gemini MCQ generation error: {e}")
+        return None
+
+
+def generate_style_profile(course_code, combined_exam_text, api_key):
+    try:
+        client = genai.Client(api_key=api_key)
+
+        shortened_text = combined_exam_text[:30000]
+
+        prompt = f"""
+You are analyzing past year final exam papers for a university course.
+
+Course code: {course_code}
+
+Based on the exam papers below, create a style profile for this course.
+
+Your output must be plain text only.
+Do not use markdown code fences.
+Do not output JSON.
+
+Use this exact format:
+
+Course Code: {course_code}
+
+1. Common Exam Format
+- ...
+- ...
+- ...
+
+2. Common Question Types
+- ...
+- ...
+- ...
+
+3. Common Topics / Repeated Focus
+- ...
+- ...
+- ...
+
+4. Common Command Words
+- ...
+- ...
+- ...
+
+5. Answer Style Expected
+- ...
+- ...
+- ...
+
+6. Difficulty Pattern
+- ...
+- ...
+- ...
+
+7. Coding Question Pattern
+- ...
+- ...
+- ...
+
+8. UI / Practical Pattern
+- ...
+- ...
+- ...
+
+9. Notes for AI Question Generation
+- ...
+- ...
+- ...
+
+Instructions:
+- Focus mainly on the most recent papers provided.
+- Summarize the paper style, not every single question.
+- Be specific and practical.
+- If coding is important, say so clearly.
+- If theory is important, say so clearly.
+- If screenshots, UI tasks, multi-file structure, navigation, state handling, reusable components, or similar patterns appear, mention them.
+- Keep each bullet short and useful.
+
+Exam papers text:
+{shortened_text}
+"""
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.2
+            )
+        )
+
+        if response.text:
+            return response.text.strip()
+
+        return None
+
+    except Exception as e:
+        print(f"Gemini style profile generation error: {e}")
         return None

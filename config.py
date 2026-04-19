@@ -14,3 +14,4 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    PAST_PAPERS_FOLDER = os.path.join(BASE_DIR, "past_papers")
