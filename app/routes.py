@@ -1,19 +1,22 @@
 import os
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, send_file
+from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 from app import db
 from app.models import Material, Question, Choice
-from app.services.pdf_service import extract_text_from_pdf
-from app.services.ai_service import extract_text_with_gemini, generate_mcqs_from_text
+from app.services.ai_service import generate_mcqs_from_text
 from app.services.course_profile_service import build_style_profile_for_course
+from app.services.lecture_file_service import extract_text_from_file, combine_extracted_text
 
 main = Blueprint("main", __name__)
 
 
+ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "html"}
+
+
 def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() == "pdf"
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @main.route("/")
@@ -32,60 +35,64 @@ def dashboard():
 @login_required
 def upload():
     if request.method == "POST":
-        if "pdf_file" not in request.files:
-            flash("No file part found.", "danger")
-            return redirect(url_for("main.upload"))
-
-        file = request.files["pdf_file"]
-
-        if file.filename == "":
-            flash("Please choose a PDF file.", "danger")
-            return redirect(url_for("main.upload"))
-
         title = request.form.get("title", "").strip()
 
         if not title:
             flash("Please enter a title.", "danger")
             return redirect(url_for("main.upload"))
 
-        if file and allowed_file(file.filename):
+        uploaded_files = request.files.getlist("note_files")
+
+        valid_files = [f for f in uploaded_files if f and f.filename.strip()]
+
+        if not valid_files:
+            flash("Please upload at least 1 file.", "danger")
+            return redirect(url_for("main.upload"))
+
+        if len(valid_files) > 3:
+            flash("You can upload a maximum of 3 files only.", "danger")
+            return redirect(url_for("main.upload"))
+
+        upload_folder = current_app.config["UPLOAD_FOLDER"]
+        os.makedirs(upload_folder, exist_ok=True)
+
+        gemini_api_key = current_app.config.get("GEMINI_API_KEY")
+
+        saved_filenames = []
+        file_results = []
+
+        for file in valid_files:
+            if not allowed_file(file.filename):
+                flash("Only PDF, DOCX, PPTX, and HTML files are allowed.", "danger")
+                return redirect(url_for("main.upload"))
+
             filename = secure_filename(file.filename)
-
-            upload_folder = current_app.config["UPLOAD_FOLDER"]
-            os.makedirs(upload_folder, exist_ok=True)
-
             file_path = os.path.join(upload_folder, filename)
             file.save(file_path)
 
-            extracted_text = extract_text_from_pdf(file_path)
-            extraction_method = "PyMuPDF"
+            extension = filename.rsplit(".", 1)[1].lower()
+            extracted_text = extract_text_from_file(file_path, extension, gemini_api_key)
 
-            if not extracted_text:
-                gemini_api_key = current_app.config.get("GEMINI_API_KEY")
-                if gemini_api_key:
-                    extracted_text = extract_text_with_gemini(file_path, gemini_api_key)
-                    extraction_method = "Gemini"
-                else:
-                    extraction_method = "None"
+            saved_filenames.append(filename)
+            file_results.append({
+                "filename": filename,
+                "text": extracted_text
+            })
 
-            new_material = Material(
-                title=title,
-                filename=filename,
-                extracted_text=extracted_text
-            )
+        combined_text = combine_extracted_text(file_results)
+        combined_filename_text = ", ".join(saved_filenames)
 
-            db.session.add(new_material)
-            db.session.commit()
+        new_material = Material(
+            title=title,
+            filename=combined_filename_text,
+            extracted_text=combined_text
+        )
 
-            if extracted_text:
-                flash(f"PDF uploaded successfully. Text extracted using {extraction_method}.", "success")
-            else:
-                flash("PDF uploaded, but text extraction failed. Check your Gemini API key or try another file.", "warning")
+        db.session.add(new_material)
+        db.session.commit()
 
-            return redirect(url_for("main.dashboard"))
-
-        flash("Only PDF files are allowed.", "danger")
-        return redirect(url_for("main.upload"))
+        flash("Lecture files uploaded and processed successfully.", "success")
+        return redirect(url_for("main.dashboard"))
 
     return render_template("upload.html")
 

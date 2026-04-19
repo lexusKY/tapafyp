@@ -1,22 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}Upload PDF - TAPA{% endblock %}
+{% block title %}Upload Lecture Files - TAPA{% endblock %}
 
 {% block content %}
-    <h2>Upload Past Year Exam PDF</h2>
-    <p>Select a UTAR final exam PDF to use as the question source.</p>
+    <h2>Upload Lecture Files</h2>
+    <p>Upload up to 3 files for one revision set.</p>
+    <p>Supported formats: PDF, DOCX, PPTX, HTML</p>
 
     <form method="POST" enctype="multipart/form-data">
         <div style="margin-bottom: 10px;">
-            <label for="title">Material Title</label><br>
-            <input type="text" id="title" name="title" placeholder="Example: UECS2023 Final Exam 2024" required>
+            <label for="title">Revision Set Title</label><br>
+            <input type="text" id="title" name="title" placeholder="Example: UECS3253 Topic 1 Notes" required>
         </div>
 
         <div style="margin-bottom: 10px;">
-            <label for="pdf_file">Choose PDF</label><br>
-            <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
+            <label for="note_files">Choose 1 to 3 files</label><br>
+            <input type="file" id="note_files" name="note_files" multiple required>
         </div>
 
-        <button type="submit">Upload PDF</button>
+        <button type="submit">Upload Files</button>
     </form>
 {% endblock %}

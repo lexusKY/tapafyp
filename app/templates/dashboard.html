@@ -8,10 +8,10 @@
     <p>This is your dashboard.</p>
 
     <p>
-        <a href="{{ url_for('main.upload') }}">Upload Past Year Exam PDF</a>
+        <a href="{{ url_for('main.upload') }}">Upload Lecture Files</a>
     </p>
 
-    <h3>Uploaded Materials</h3>
+    <h3>Uploaded Revision Sets</h3>
 
     {% if materials %}
         <ul>
@@ -30,6 +30,6 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p>No uploaded materials yet.</p>
+        <p>No uploaded revision sets yet.</p>
     {% endif %}
 {% endblock %}
