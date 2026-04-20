@@ -3,32 +3,32 @@
 {% block title %}Choose Level - TAPA{% endblock %}
 
 {% block content %}
-    <h2>Choose Your Quiz Level</h2>
-    <p><strong>{{ material.title }}</strong></p>
-    <p>Course: {{ material.course_code }}</p>
-
-    <div style="max-width: 700px; margin-top: 20px;">
-        <div style="margin-bottom: 15px;">
-            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='All') }}">
-                <button type="button">All ({{ all_count }})</button>
-            </a>
+    <div class="card">
+        <div class="page-title">Choose Your Quiz Level</div>
+        <div class="page-subtitle">
+            <strong>{{ material.title }}</strong><br>
+            Course: {{ material.course_code }}
         </div>
 
-        <div style="margin-bottom: 15px;">
-            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='Hot') }}">
-                <button type="button">Hot ({{ hot_count }})</button>
+        <div class="level-grid">
+            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='All') }}">
+                <div class="level-title">All</div>
+                <div class="level-count">{{ all_count }} questions</div>
             </a>
-        </div>
 
-        <div style="margin-bottom: 15px;">
-            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='Moderate') }}">
-                <button type="button">Moderate ({{ moderate_count }})</button>
+            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='Hot') }}">
+                <div class="level-title">Hot</div>
+                <div class="level-count">{{ hot_count }} questions</div>
             </a>
-        </div>
 
-        <div style="margin-bottom: 15px;">
-            <a href="{{ url_for('main.start_quiz', material_id=material.id, level='Cold') }}">
-                <button type="button">Cold ({{ cold_count }})</button>
+            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='Moderate') }}">
+                <div class="level-title">Moderate</div>
+                <div class="level-count">{{ moderate_count }} questions</div>
+            </a>
+
+            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='Cold') }}">
+                <div class="level-title">Cold</div>
+                <div class="level-count">{{ cold_count }} questions</div>
             </a>
         </div>
     </div>

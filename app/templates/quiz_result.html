@@ -3,15 +3,22 @@
 {% block title %}Quiz Result - TAPA{% endblock %}
 
 {% block content %}
-    <h2>Quiz Result</h2>
-    <p><strong>{{ material.title }}</strong></p>
-    <p>Level: <strong>{{ level }}</strong></p>
-    <p>Your score: <strong>{{ score }}/{{ total_questions }}</strong></p>
+    <div class="card result-summary">
+        <div class="page-title">Quiz Complete</div>
+        <div class="page-subtitle">
+            <strong>{{ material.title }}</strong><br>
+            Level: {{ level }}
+        </div>
+        <div class="result-score">{{ score }}/{{ total_questions }}</div>
 
-    <hr>
+        <div class="inline-actions" style="justify-content: center;">
+            <a class="btn" href="{{ url_for('main.choose_level', material_id=material.id) }}">Choose Another Level</a>
+            <a class="btn btn-secondary" href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+        </div>
+    </div>
 
     {% for item in results %}
-        <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 10px;">
+        <div class="result-item">
             <h3>Q{{ loop.index }}. {{ item.question.question_text }}</h3>
 
             <p>
@@ -31,15 +38,12 @@
             </p>
 
             <p>
-                Result:
                 {% if item.is_correct %}
-                    <strong style="color: green;">Correct</strong>
+                    <span class="correct-text">Correct</span>
                 {% else %}
-                    <strong style="color: red;">Wrong</strong>
+                    <span class="wrong-text">Wrong</span>
                 {% endif %}
             </p>
         </div>
     {% endfor %}
-
-    <a href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
 {% endblock %}

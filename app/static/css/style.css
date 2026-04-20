@@ -1,9 +1,247 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    background: #f7f7f7;
+    margin: 0;
+    padding: 0;
+    color: #222;
+}
+
+nav {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 16px 24px;
 }
 
 nav a {
-    margin-right: 12px;
+    margin-right: 18px;
     text-decoration: none;
+    color: #4b4b4b;
+    font-weight: 600;
+}
+
+nav a:hover {
+    color: #1cb0f6;
+}
+
+.page-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    margin-bottom: 20px;
+}
+
+.flash-message {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-left: 6px solid #58cc02;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.page-subtitle {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.btn {
+    display: inline-block;
+    background: #58cc02;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: #46a302;
+}
+
+.btn-secondary {
+    background: #1cb0f6;
+}
+
+.btn-secondary:hover {
+    background: #1297d8;
+}
+
+.btn-outline {
+    background: white;
+    color: #444;
+    border: 2px solid #dcdcdc;
+}
+
+.btn-outline:hover {
+    border-color: #1cb0f6;
+    color: #1cb0f6;
+}
+
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.level-card {
+    background: white;
+    border: 2px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 22px;
+    text-align: center;
+    text-decoration: none;
+    color: #222;
+    transition: 0.2s ease;
+}
+
+.level-card:hover {
+    border-color: #1cb0f6;
+    transform: translateY(-2px);
+}
+
+.level-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.level-count {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.progress-wrap {
+    margin: 12px 0 24px 0;
+}
+
+.question-meta {
+    color: #777;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.question-text {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 24px;
+}
+
+.choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.choice-item label {
+    display: block;
+    padding: 16px 18px;
+    border: 2px solid #e3e3e3;
+    border-radius: 16px;
+    cursor: pointer;
+    background: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.choice-item label:hover {
+    border-color: #1cb0f6;
+    background: #f4fbff;
+}
+
+.choice-item input[type="radio"] {
+    margin-right: 10px;
+}
+
+.result-summary {
+    text-align: center;
+    padding: 24px;
+}
+
+.result-score {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #58cc02;
+    margin: 10px 0;
+}
+
+.result-item {
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+    background: white;
+}
+
+.correct-text {
+    color: #46a302;
+    font-weight: 800;
+}
+
+.wrong-text {
+    color: #ff4b4b;
+    font-weight: 800;
+}
+
+.inline-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.upload-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #1cb0f6;
+    text-decoration: none;
+}
+
+.upload-link:hover {
+    text-decoration: underline;
+}
+
+.quiz-generate-btn {
+    display: inline-block;
+    background: white;
+    color: #444;
+    border: 2px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.quiz-generate-btn:hover {
+    background: #4db8ff;
+    color: white;
+    border-color: #4db8ff;
+}
+
+.quiz-generate-form {
+    display: inline-block;
+    margin-left: 8px;
 }
