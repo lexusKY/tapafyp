@@ -245,3 +245,35 @@ nav a:hover {
     display: inline-block;
     margin-left: 8px;
 }
+
+.choice-item label[style*="border-color"] {
+    font-weight: 700;
+}
+
+.choice-correct {
+    border-color: #58cc02 !important;
+    background: #eef9e8 !important;
+    font-weight: 700;
+}
+
+.choice-wrong {
+    border-color: #ff4b4b !important;
+    background: #fff1f1 !important;
+    font-weight: 700;
+}
+
+.feedback-box {
+    margin-bottom: 20px;
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.feedback-correct {
+    background: #eef9e8;
+    border: 1px solid #b7e3a1;
+}
+
+.feedback-wrong {
+    background: #fff1f1;
+    border: 1px solid #ffc9c9;
+}

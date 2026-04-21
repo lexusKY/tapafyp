@@ -49,9 +49,7 @@ def get_retry_questions(material_id, level):
 
     questions = Question.query.filter(Question.id.in_(question_ids)).all()
     question_map = {q.id: q for q in questions}
-
-    ordered_questions = [question_map[qid] for qid in question_ids if qid in question_map]
-    return ordered_questions
+    return [question_map[qid] for qid in question_ids if qid in question_map]
 
 
 @main.route("/")
@@ -269,24 +267,35 @@ def quiz_question(material_id, level, question_number):
     session_key = f"quiz_{material_id}_{level}_answers"
     answers = session.get(session_key, {})
 
-    if request.method == "POST":
-        selected_choice_id = request.form.get("selected_choice")
-
-        if not selected_choice_id:
-            flash("Please select an answer before continuing.", "warning")
-            return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=question_number))
-
-        answers[str(current_question.id)] = int(selected_choice_id)
-        session[session_key] = answers
-
-        next_question_number = question_number + 1
-
-        if next_question_number > total_questions:
-            return redirect(url_for("main.quiz_result", material_id=material.id, level=level))
-
-        return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=next_question_number))
-
     selected_answer = answers.get(str(current_question.id))
+    feedback_mode = False
+    feedback_correct = False
+    correct_choice = Choice.query.filter_by(question_id=current_question.id, is_correct=True).first()
+
+    if request.method == "POST":
+        action = request.form.get("action", "check")
+
+        if action == "check":
+            selected_choice_id = request.form.get("selected_choice")
+
+            if not selected_choice_id:
+                flash("Please select an answer before checking.", "warning")
+                return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=question_number))
+
+            answers[str(current_question.id)] = int(selected_choice_id)
+            session[session_key] = answers
+
+            selected_answer = int(selected_choice_id)
+            feedback_mode = True
+            feedback_correct = correct_choice is not None and selected_answer == correct_choice.id
+
+        elif action == "continue":
+            next_question_number = question_number + 1
+
+            if next_question_number > total_questions:
+                return redirect(url_for("main.quiz_result", material_id=material.id, level=level))
+
+            return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=next_question_number))
 
     return render_template(
         "quiz_question.html",
@@ -295,7 +304,10 @@ def quiz_question(material_id, level, question_number):
         question_number=question_number,
         total_questions=total_questions,
         selected_answer=selected_answer,
-        level=level
+        level=level,
+        feedback_mode=feedback_mode,
+        feedback_correct=feedback_correct,
+        correct_choice=correct_choice
     )
 
 
@@ -384,24 +396,35 @@ def retry_question(material_id, level, question_number):
     session_key = f"retry_{material_id}_{level}_answers"
     answers = session.get(session_key, {})
 
-    if request.method == "POST":
-        selected_choice_id = request.form.get("selected_choice")
-
-        if not selected_choice_id:
-            flash("Please select an answer before continuing.", "warning")
-            return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=question_number))
-
-        answers[str(current_question.id)] = int(selected_choice_id)
-        session[session_key] = answers
-
-        next_question_number = question_number + 1
-
-        if next_question_number > total_questions:
-            return redirect(url_for("main.retry_result", material_id=material.id, level=level))
-
-        return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=next_question_number))
-
     selected_answer = answers.get(str(current_question.id))
+    feedback_mode = False
+    feedback_correct = False
+    correct_choice = Choice.query.filter_by(question_id=current_question.id, is_correct=True).first()
+
+    if request.method == "POST":
+        action = request.form.get("action", "check")
+
+        if action == "check":
+            selected_choice_id = request.form.get("selected_choice")
+
+            if not selected_choice_id:
+                flash("Please select an answer before checking.", "warning")
+                return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=question_number))
+
+            answers[str(current_question.id)] = int(selected_choice_id)
+            session[session_key] = answers
+
+            selected_answer = int(selected_choice_id)
+            feedback_mode = True
+            feedback_correct = correct_choice is not None and selected_answer == correct_choice.id
+
+        elif action == "continue":
+            next_question_number = question_number + 1
+
+            if next_question_number > total_questions:
+                return redirect(url_for("main.retry_result", material_id=material.id, level=level))
+
+            return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=next_question_number))
 
     return render_template(
         "quiz_question.html",
@@ -410,7 +433,10 @@ def retry_question(material_id, level, question_number):
         question_number=question_number,
         total_questions=total_questions,
         selected_answer=selected_answer,
-        level=f"{level} Retry"
+        level=f"{level} Retry",
+        feedback_mode=feedback_mode,
+        feedback_correct=feedback_correct,
+        correct_choice=correct_choice
     )
 
 

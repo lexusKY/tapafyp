@@ -12,24 +12,53 @@
             <progress value="{{ question_number }}" max="{{ total_questions }}" style="width: 100%; height: 18px;"></progress>
         </div>
 
+        <div class="question-text">{{ question.question_text }}</div>
+
+        {% if question.hint %}
+            <div style="margin-bottom: 20px; padding: 12px 14px; background: #f4fbff; border: 1px solid #d9efff; border-radius: 12px;">
+                <strong>Hint:</strong> {{ question.hint }}
+            </div>
+        {% endif %}
+
+        {% if feedback_mode %}
+            <div class="feedback-box {% if feedback_correct %}feedback-correct{% else %}feedback-wrong{% endif %}">
+                <p style="margin-top: 0;">
+                    {% if feedback_correct %}
+                        <strong class="correct-text">Correct!</strong>
+                    {% else %}
+                        <strong class="wrong-text">Wrong.</strong>
+                    {% endif %}
+                </p>
+
+                {% if correct_choice %}
+                    <p><strong>Correct answer:</strong> {{ correct_choice.choice_text }}</p>
+                {% endif %}
+
+                {% if question.explanation %}
+                    <p style="margin-bottom: 0;"><strong>Explanation:</strong> {{ question.explanation }}</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
         <form method="POST">
-            <div class="question-text">{{ question.question_text }}</div>
-
-            {% if question.hint %}
-                <div style="margin-bottom: 20px; padding: 12px 14px; background: #f4fbff; border: 1px solid #d9efff; border-radius: 12px;">
-                    <strong>Hint:</strong> {{ question.hint }}
-                </div>
-            {% endif %}
-
             <div class="choice-list">
                 {% for choice in question.choices %}
                     <div class="choice-item">
-                        <label>
+                        <label
+                            class="
+                                {% if feedback_mode and correct_choice and choice.id == correct_choice.id %}
+                                    choice-correct
+                                {% elif feedback_mode and selected_answer == choice.id and correct_choice and choice.id != correct_choice.id %}
+                                    choice-wrong
+                                {% endif %}
+                            "
+                        >
                             <input
                                 type="radio"
                                 name="selected_choice"
                                 value="{{ choice.id }}"
                                 {% if selected_answer == choice.id %}checked{% endif %}
+                                {% if feedback_mode %}disabled{% endif %}
                             >
                             {{ choice.choice_text }}
                         </label>
@@ -38,9 +67,13 @@
             </div>
 
             <div class="inline-actions">
-                <button type="submit" class="btn">
-                    {% if question_number == total_questions %}Finish Quiz{% else %}Next{% endif %}
-                </button>
+                {% if feedback_mode %}
+                    <button type="submit" name="action" value="continue" class="btn">
+                        {% if question_number == total_questions %}Finish Quiz{% else %}Continue{% endif %}
+                    </button>
+                {% else %}
+                    <button type="submit" name="action" value="check" class="btn">Check</button>
+                {% endif %}
             </div>
         </form>
     </div>
