@@ -12,8 +12,11 @@
         <div class="result-score">{{ score }}/{{ total_questions }}</div>
 
         <div class="inline-actions" style="justify-content: center;">
-            <a class="btn" href="{{ url_for('main.choose_level', material_id=material.id) }}">Choose Another Level</a>
-            <a class="btn btn-secondary" href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
+            {% if retry_available %}
+                <a class="btn" href="{{ url_for('main.retry_wrong', material_id=material.id, level=level) }}">Retry Wrong Questions</a>
+            {% endif %}
+            <a class="btn btn-secondary" href="{{ url_for('main.choose_level', material_id=material.id) }}">Choose Another Level</a>
+            <a class="btn btn-outline" href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
         </div>
     </div>
 

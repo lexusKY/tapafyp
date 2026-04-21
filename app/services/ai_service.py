@@ -23,7 +23,9 @@ Your task:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=[uploaded_file, prompt],
-            config=types.GenerateContentConfig(temperature=0)
+            config=types.GenerateContentConfig(
+                temperature=0
+            )
         )
 
         if response.text:
@@ -66,29 +68,43 @@ Rules:
 6. Only 1 choice must be correct.
 7. Include difficulty using only: Hot, Moderate, Cold.
 8. Return valid JSON only.
-9. Do not use markdown fences.
-10. Do not include explanations before or after the JSON.
-
-Return this exact JSON format:
-[
-  {{
-    "question_text": "string",
-    "difficulty": "Hot",
-    "choices": [
-      {{"choice_text": "string", "is_correct": true}},
-      {{"choice_text": "string", "is_correct": false}},
-      {{"choice_text": "string", "is_correct": false}},
-      {{"choice_text": "string", "is_correct": false}}
-    ]
-  }}
-]
 """
+
+        response_schema = {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "question_text": {"type": "string"},
+                    "difficulty": {
+                        "type": "string",
+                        "enum": ["Hot", "Moderate", "Cold"]
+                    },
+                    "choices": {
+                        "type": "array",
+                        "minItems": 4,
+                        "maxItems": 4,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "choice_text": {"type": "string"},
+                                "is_correct": {"type": "boolean"}
+                            },
+                            "required": ["choice_text", "is_correct"]
+                        }
+                    }
+                },
+                "required": ["question_text", "difficulty", "choices"]
+            }
+        }
 
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
-                temperature=0.3
+                temperature=0.3,
+                response_mime_type="application/json",
+                response_schema=response_schema
             )
         )
 
@@ -96,22 +112,30 @@ Return this exact JSON format:
             print("Gemini MCQ generation error: empty response")
             return None
 
-        cleaned_text = response.text.strip()
-
         print("========== RAW GEMINI MCQ RESPONSE START ==========")
-        print(cleaned_text)
+        print(response.text)
         print("========== RAW GEMINI MCQ RESPONSE END ==========")
 
-        if cleaned_text.startswith("```json"):
-            cleaned_text = cleaned_text.replace("```json", "", 1).strip()
+        questions = getattr(response, "parsed", None)
 
-        if cleaned_text.startswith("```"):
-            cleaned_text = cleaned_text.replace("```", "", 1).strip()
+        if questions is None:
+            questions = json.loads(response.text)
 
-        if cleaned_text.endswith("```"):
-            cleaned_text = cleaned_text[:-3].strip()
+        if not isinstance(questions, list) or len(questions) == 0:
+            print("Gemini MCQ generation error: parsed response is empty or invalid")
+            return None
 
-        return json.loads(cleaned_text)
+        for q in questions:
+            if "choices" not in q or len(q["choices"]) != 4:
+                print("Gemini MCQ generation error: each question must have exactly 4 choices")
+                return None
+
+            correct_count = sum(1 for c in q["choices"] if c.get("is_correct") is True)
+            if correct_count != 1:
+                print("Gemini MCQ generation error: each question must have exactly 1 correct answer")
+                return None
+
+        return questions
 
     except Exception as e:
         print(f"Gemini MCQ generation error: {e}")

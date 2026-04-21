@@ -1,0 +1,65 @@
+Course Code: UKFF4024
+
+1. Common Exam Format
+- Two sections: Section A (Compulsory) and Section B (Optional).
+- Section A: Consists of ONE (1) compulsory question, worth 40 marks.
+- Section B: Consists of three (3) optional questions, students must answer ONLY TWO (2) questions, each worth 30 marks, totaling 60 marks.
+- Total marks: 100 marks.
+- Duration: Typically 3 hours (one instance of 2.5 hours observed).
+- Total questions: 4 questions (1 in Section A, 3 in Section B).
+- Explicit instruction for calculation questions: "marks will be awarded for detailed workings."
+
+2. Common Question Types
+- Extensive Calculation Problems: Predominant in Section A, often multi-part, involving foreign exchange hedging strategies (forward, money market, options). Also present in Section B (e.g., NPV, arbitrage, futures, deposit returns).
+- Scenario-Based Application: Most questions are set within a business context (e.g., a company importing/exporting, considering FDI, managing cash flows).
+- Explanatory/Descriptive Questions: Requiring definitions, explanations of concepts, strategies, or impacts.
+- Analytical/Evaluative Questions: Asking to analyze situations, evaluate choices, assess advantages/disadvantages, or recommend optimal strategies.
+- Comparative Questions: Distinguishing between concepts or comparing different approaches.
+
+3. Common Topics / Repeated Focus
+- Foreign Exchange Risk Management: Transaction exposure (hedging using forward, money market, options, internal strategies like leading/lagging, netting), translation exposure (impact on financial statements, hedging), operating exposure.
+- International Capital Budgeting: Project evaluation (NPV, APV), cost of capital, local vs. parent perspective.
+- International Financing: Capital structure decisions for MNCs, sources of funds, interest rate and currency swaps, borrowing foreign currency.
+- International Trade Finance: Letters of Credit (LCs).
+- Exchange Rate Theories and Mechanics: Spot/forward rates, interest rate parity, purchasing power parity (PPP), locational arbitrage, central bank intervention (sterilized/non-sterilized), exchange rate pass-through.
+- Foreign Direct Investment (FDI): Strategic motives, political risk, government restrictions, financial incentives, advantages/disadvantages of different entry modes (e.g., acquisition vs. greenfield).
+- Multinational Cash Management.
+- Futures Contracts: Currency futures, interest rate futures.
+
+4. Common Command Words
+- Calculate, Compute, Determine: For numerical answers.
+- Explain, Describe: For conceptual understanding and detailing.
+- Discuss, Analyze: For in-depth examination, pros/cons, implications.
+- Evaluate, Assess: For judging value, effectiveness, or impact.
+- Recommend, Justify: For providing advice with reasoning.
+- Formulate: For constructing strategies.
+- State: For listing points.
+
+5. Answer Style Expected
+- Quantitative Answers: Must include detailed, step-by-step workings. Final answers should be clearly stated.
+- Qualitative Answers: Should be well-structured, comprehensive, and demonstrate a deep understanding of the concepts. Use of relevant financial terminology is crucial.
+- Scenario Application: Answers must directly address the specifics of the given scenario, applying theoretical knowledge to the practical context.
+- Critical Thinking: For evaluative questions, answers should present balanced arguments, considering various factors (financial, risk, strategic).
+- Clarity and Conciseness: While comprehensive, answers should be clear and to the point.
+- Tabular Presentation: Often useful and sometimes explicitly requested for comparisons or complex calculations.
+
+6. Difficulty Pattern
+- Consistent High Difficulty in Section A: The compulsory question is always a complex, multi-part calculation problem on foreign exchange hedging, requiring meticulous attention to detail and accurate application of multiple techniques. It is consistently the most challenging part of the exam.
+- Moderate to High Difficulty in Section B: Questions vary, including both calculations and in-depth discussions. They require strong analytical skills and a broad understanding of multinational finance topics.
+- Overall: The exam demands both strong quantitative skills and a solid theoretical foundation. Time management is crucial due to the length and complexity of calculations.
+
+7. Coding Question Pattern
+- No coding questions are present in the exam papers. The course does not involve programming.
+
+8. UI / Practical Pattern
+- No UI or practical application questions (e.g., software usage, case study presentations) are present. The exam is entirely written.
+
+9. Notes for AI Question Generation
+- Section A: Design a comprehensive, multi-part scenario-based question on foreign exchange transaction exposure hedging. Include forward, money market, and option market hedges. Ensure all necessary rates (spot, forward, bid/ask, borrow/deposit, option premiums/strike) are provided. Include an evaluative sub-question asking for the best strategy and its implications.
+- Section B: Create a balanced mix of calculation and discussion questions.
+- Calculation examples: NPV for foreign projects (using different inflation/exchange rates), locational arbitrage, futures profit/loss, yield on foreign deposits.
+- Discussion examples: Strategic motives for FDI, optimal capital structure for MNCs, advantages/disadvantages of trade finance instruments (LCs), types of foreign exchange exposure and their management, impact of economic indicators on exchange rates, central bank interventions, currency/interest rate swaps.
+- Emphasize the need for detailed workings in calculation questions.
+- Vary the currencies and geographical contexts in scenarios.
+- Use a range of command words to elicit different levels of cognitive response (e.g., explain, analyze, evaluate, calculate, recommend).
+- Consider questions that require comparison or critical assessment of different financial strategies or concepts.

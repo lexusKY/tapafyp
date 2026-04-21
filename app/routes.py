@@ -40,6 +40,20 @@ def get_filtered_questions(material_id, level):
     return query.order_by(Question.id.asc()).all()
 
 
+def get_retry_questions(material_id, level):
+    session_key = f"retry_{material_id}_{level}_question_ids"
+    question_ids = session.get(session_key, [])
+
+    if not question_ids:
+        return []
+
+    questions = Question.query.filter(Question.id.in_(question_ids)).all()
+    question_map = {q.id: q for q in questions}
+
+    ordered_questions = [question_map[qid] for qid in question_ids if qid in question_map]
+    return ordered_questions
+
+
 @main.route("/")
 def index():
     return render_template("index.html")
@@ -227,6 +241,9 @@ def start_quiz(material_id, level):
         return redirect(url_for("main.choose_level", material_id=material.id))
 
     session[f"quiz_{material_id}_{level}_answers"] = {}
+    session.pop(f"retry_{material_id}_{level}_question_ids", None)
+    session.pop(f"retry_{material_id}_{level}_answers", None)
+
     return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=1))
 
 
@@ -290,6 +307,121 @@ def quiz_result(material_id, level):
 
     score = 0
     results = []
+    wrong_question_ids = []
+
+    for question in questions:
+        correct_choice = Choice.query.filter_by(question_id=question.id, is_correct=True).first()
+        selected_choice_id = answers.get(str(question.id))
+        selected_choice = Choice.query.get(selected_choice_id) if selected_choice_id else None
+
+        is_correct = (
+            selected_choice is not None and
+            correct_choice is not None and
+            selected_choice.id == correct_choice.id
+        )
+
+        if is_correct:
+            score += 1
+        else:
+            wrong_question_ids.append(question.id)
+
+        results.append({
+            "question": question,
+            "selected_choice": selected_choice,
+            "correct_choice": correct_choice,
+            "is_correct": is_correct
+        })
+
+    total_questions = len(questions)
+    retry_available = len(wrong_question_ids) > 0
+
+    session[f"retry_{material_id}_{level}_question_ids"] = wrong_question_ids
+
+    return render_template(
+        "quiz_result.html",
+        material=material,
+        score=score,
+        total_questions=total_questions,
+        results=results,
+        level=level,
+        retry_available=retry_available
+    )
+
+
+@main.route("/retry-wrong/<int:material_id>/<level>")
+@login_required
+def retry_wrong(material_id, level):
+    material = Material.query.get_or_404(material_id)
+    questions = get_retry_questions(material.id, level)
+
+    if not questions:
+        flash("No wrong questions available to retry.", "warning")
+        return redirect(url_for("main.quiz_result", material_id=material.id, level=level))
+
+    session[f"retry_{material_id}_{level}_answers"] = {}
+    return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=1))
+
+
+@main.route("/retry-quiz/<int:material_id>/<level>/<int:question_number>", methods=["GET", "POST"])
+@login_required
+def retry_question(material_id, level, question_number):
+    material = Material.query.get_or_404(material_id)
+    questions = get_retry_questions(material.id, level)
+
+    if not questions:
+        flash("No retry questions found.", "warning")
+        return redirect(url_for("main.dashboard"))
+
+    total_questions = len(questions)
+
+    if question_number < 1 or question_number > total_questions:
+        return redirect(url_for("main.retry_result", material_id=material.id, level=level))
+
+    current_question = questions[question_number - 1]
+    session_key = f"retry_{material_id}_{level}_answers"
+    answers = session.get(session_key, {})
+
+    if request.method == "POST":
+        selected_choice_id = request.form.get("selected_choice")
+
+        if not selected_choice_id:
+            flash("Please select an answer before continuing.", "warning")
+            return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=question_number))
+
+        answers[str(current_question.id)] = int(selected_choice_id)
+        session[session_key] = answers
+
+        next_question_number = question_number + 1
+
+        if next_question_number > total_questions:
+            return redirect(url_for("main.retry_result", material_id=material.id, level=level))
+
+        return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=next_question_number))
+
+    selected_answer = answers.get(str(current_question.id))
+
+    return render_template(
+        "quiz_question.html",
+        material=material,
+        question=current_question,
+        question_number=question_number,
+        total_questions=total_questions,
+        selected_answer=selected_answer,
+        level=f"{level} Retry"
+    )
+
+
+@main.route("/retry-result/<int:material_id>/<level>")
+@login_required
+def retry_result(material_id, level):
+    material = Material.query.get_or_404(material_id)
+    questions = get_retry_questions(material.id, level)
+
+    session_key = f"retry_{material_id}_{level}_answers"
+    answers = session.get(session_key, {})
+
+    score = 0
+    results = []
 
     for question in questions:
         correct_choice = Choice.query.filter_by(question_id=question.id, is_correct=True).first()
@@ -320,7 +452,8 @@ def quiz_result(material_id, level):
         score=score,
         total_questions=total_questions,
         results=results,
-        level=level
+        level=f"{level} Retry",
+        retry_available=False
     )
 
 
