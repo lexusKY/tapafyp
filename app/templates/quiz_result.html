@@ -24,6 +24,8 @@
         <div class="result-item">
             <h3>Q{{ loop.index }}. {{ item.question.question_text }}</h3>
 
+            <p><strong>Type:</strong> {{ item.question.question_type or 'mcq' }}</p>
+
             <p>
                 Your answer:
                 <strong>
@@ -39,6 +41,13 @@
                 Correct answer:
                 <strong>{{ item.correct_choice.choice_text if item.correct_choice else 'N/A' }}</strong>
             </p>
+
+            {% if item.question.explanation %}
+                <p>
+                    <strong>Explanation:</strong>
+                    {{ item.question.explanation }}
+                </p>
+            {% endif %}
 
             <p>
                 {% if item.is_correct %}

@@ -186,7 +186,10 @@ def generate_quiz(material_id):
         new_question = Question(
             material_id=material.id,
             question_text=q["question_text"],
-            difficulty=q["difficulty"]
+            difficulty=q["difficulty"],
+            question_type=q.get("question_type", "mcq"),
+            hint=q.get("hint", ""),
+            explanation=q.get("explanation", "")
         )
         db.session.add(new_question)
         db.session.flush()

@@ -35,6 +35,9 @@ class Question(db.Model):
     material_id = db.Column(db.Integer, db.ForeignKey("materials.id"), nullable=False)
     question_text = db.Column(db.Text, nullable=False)
     difficulty = db.Column(db.String(20), nullable=False)
+    question_type = db.Column(db.String(50), nullable=True, default="mcq")
+    hint = db.Column(db.Text, nullable=True)
+    explanation = db.Column(db.Text, nullable=True)
 
     choices = db.relationship("Choice", backref="question", lazy=True, cascade="all, delete-orphan")
 

@@ -46,7 +46,7 @@ def generate_mcqs_from_text(extracted_text, api_key, course_code=None, style_pro
         style_profile_text = (style_profile_text or "")[:12000]
 
         prompt = f"""
-You are helping build TAPA, an educational revision quiz system.
+You are helping build TAPA, an educational revision and learning system.
 
 Generate 5 original multiple-choice questions based on the student's uploaded lecture notes.
 
@@ -67,7 +67,10 @@ Rules:
 5. Each question must have exactly 4 choices.
 6. Only 1 choice must be correct.
 7. Include difficulty using only: Hot, Moderate, Cold.
-8. Return valid JSON only.
+8. question_type should currently be "mcq".
+9. Include a short hint for the learner before answering.
+10. Include a short explanation for why the correct answer is correct.
+11. Return valid JSON only.
 """
 
         response_schema = {
@@ -80,6 +83,9 @@ Rules:
                         "type": "string",
                         "enum": ["Hot", "Moderate", "Cold"]
                     },
+                    "question_type": {"type": "string"},
+                    "hint": {"type": "string"},
+                    "explanation": {"type": "string"},
                     "choices": {
                         "type": "array",
                         "minItems": 4,
@@ -94,7 +100,14 @@ Rules:
                         }
                     }
                 },
-                "required": ["question_text", "difficulty", "choices"]
+                "required": [
+                    "question_text",
+                    "difficulty",
+                    "question_type",
+                    "hint",
+                    "explanation",
+                    "choices"
+                ]
             }
         }
 

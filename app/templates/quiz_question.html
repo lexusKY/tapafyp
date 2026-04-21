@@ -15,6 +15,12 @@
         <form method="POST">
             <div class="question-text">{{ question.question_text }}</div>
 
+            {% if question.hint %}
+                <div style="margin-bottom: 20px; padding: 12px 14px; background: #f4fbff; border: 1px solid #d9efff; border-radius: 12px;">
+                    <strong>Hint:</strong> {{ question.hint }}
+                </div>
+            {% endif %}
+
             <div class="choice-list">
                 {% for choice in question.choices %}
                     <div class="choice-item">
