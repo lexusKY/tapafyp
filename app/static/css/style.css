@@ -2449,3 +2449,45 @@ button:not(.btn):hover {
         margin-top: 3px;
     }
 }
+
+/* ============================================================
+   Delete Buttons / Inline Forms
+   ============================================================ */
+
+.btn-danger-outline {
+    color: var(--r-600);
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(255, 107, 107, 0.35);
+}
+
+.btn-danger-outline:hover {
+    color: #ffffff;
+    background: var(--grad-rose);
+    border-color: transparent;
+    box-shadow: 0 6px 22px rgba(255, 107, 107, 0.28);
+}
+
+.inline-delete-form {
+    display: inline-flex;
+    margin: 0 0 0 6px;
+}
+
+.workspace-action-list form {
+    margin: 0;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .inline-delete-form {
+        display: flex;
+        width: 100%;
+        margin: 8px 0 0;
+    }
+
+    .inline-delete-form .btn {
+        width: 100%;
+    }
+}

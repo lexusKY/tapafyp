@@ -847,6 +847,35 @@ def attempt_detail(attempt_id):
         answers=answers
     )
 
+@main.route("/material/<int:material_id>/delete", methods=["POST"])
+@login_required
+def delete_material(material_id):
+    material = get_user_material_or_404(material_id)
+
+    material_title = material.title
+
+    db.session.delete(material)
+    db.session.commit()
+
+    flash(f"Material '{material_title}' has been deleted successfully.", "success")
+    return redirect(url_for("main.dashboard"))
+
+
+@main.route("/attempt/<int:attempt_id>/delete", methods=["POST"])
+@login_required
+def delete_attempt(attempt_id):
+    attempt = (
+        QuizAttempt.query
+        .filter_by(id=attempt_id, user_id=current_user.id)
+        .first_or_404()
+    )
+
+    db.session.delete(attempt)
+    db.session.commit()
+
+    flash("Quiz attempt has been deleted successfully.", "success")
+    return redirect(url_for("main.history"))
+
 
 @main.route("/profile", methods=["GET", "POST"])
 @login_required
