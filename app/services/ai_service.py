@@ -154,6 +154,7 @@ Reviewed lecture notes text:
 {shortened_text}
 
 Rules:
+Rules:
 1. Base the questions on the reviewed lecture notes.
 2. If a course style profile is provided, follow its tone, difficulty pattern, and question style.
 3. If a quiz focus is provided, prioritize that focus while still using the lecture notes.
@@ -166,13 +167,14 @@ Rules:
 10. question_type should be "mcq".
 11. Include a short hint for the learner before answering.
 12. Include a short explanation for why the correct answer is correct.
-13. If the source content contains programming code, do NOT paste a long raw code block directly into the question sentence.
-14. For programming questions, write a short question first, then include only the necessary code snippet using markdown code fences.
+13. If the source content contains programming code, do not paste a long raw code block directly into the question sentence.
+14. For programming questions, write a short readable question first, then include only the necessary code snippet using markdown code fences.
 15. Code snippets must be short and focused, preferably under 15 lines.
 16. Use the correct code fence label when obvious, such as ```tsx, ```js, ```python, ```java, ```html, or ```sql.
 17. If a long code example is needed, summarize the context and include only the important function, class, or line.
 18. Do not include huge base64 strings, long URLs, or unnecessary full files in the question text.
-19. Return valid JSON only.
+19. The question_text should be clean and readable. Do not generate one extremely long sentence.
+20. Return valid JSON only.
 """
 
         response_schema = {

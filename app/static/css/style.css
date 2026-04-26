@@ -2960,7 +2960,7 @@ button.is-loading {
 }
 
 /* ============================================================
-   Long Quiz Text / Code Wrapping Fix
+   TAPA Code Block Rendering + Long Text Fix
    ============================================================ */
 
 .quiz-question-text,
@@ -2974,6 +2974,48 @@ button.is-loading {
 
 .quiz-card {
     overflow: hidden;
+}
+
+.tapa-code-block {
+    margin: 16px 0;
+    overflow: hidden;
+    border-radius: 18px;
+    background: #15151f;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 14px 34px rgba(21, 21, 31, 0.22);
+    text-align: left;
+}
+
+.tapa-code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #1f1f2e;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tapa-code-header span {
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.tapa-code-block pre {
+    margin: 0;
+    padding: 16px;
+    overflow-x: auto;
+    white-space: pre;
+    color: #f8fafc;
+    font-size: 0.82rem;
+    line-height: 1.7;
+}
+
+.tapa-code-block code {
+    color: #f8fafc;
+    font-family: "Cascadia Code", "Consolas", "Courier New", monospace;
 }
 
 .modern-choice,

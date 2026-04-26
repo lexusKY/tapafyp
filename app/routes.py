@@ -388,7 +388,7 @@ def regenerate_confirm(material_id):
     question_count = Question.query.filter_by(material_id=material.id).count()
 
     if question_count == 0:
-        return redirect(url_for("main.generate_quiz", material_id=material.id))
+        return redirect(url_for("main.generate_first_quiz", material_id=material.id))
 
     attempt_count = (
         QuizAttempt.query
