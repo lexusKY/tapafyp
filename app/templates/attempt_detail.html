@@ -74,7 +74,7 @@
                     {% endif %}
                 </div>
 
-                <h3>{{ answer.question.question_text }}</h3>
+                <h3>{{ answer.question.question_text | render_question_text }}</h3>
 
                 <div class="answer-grid">
                     <div class="answer-box your-answer">

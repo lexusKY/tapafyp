@@ -77,7 +77,7 @@
                     {% endif %}
                 </div>
 
-                <h3>{{ question.question_text }}</h3>
+                <h3>{{ question.question_text | render_question_text }}</h3>
 
                 {% if question.hint %}
                     <div class="qb-hint">

@@ -26,7 +26,7 @@
         </div>
 
         <div class="quiz-question-text">
-            {{ question.question_text }}
+            {{ question.question_text | render_question_text }}
         </div>
 
         {% if question.hint %}
