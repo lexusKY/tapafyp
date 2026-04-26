@@ -1,22 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}Material Detail - TAPA{% endblock %}
+{% block title %}Material Workspace - TAPA{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="material-workspace">
 
-    <div class="d-flex justify-content-between align-items-start mb-4">
+    <div class="workspace-hero">
         <div>
-            <h2 class="fw-bold mb-1">{{ material.title }}</h2>
-            <p class="text-muted mb-0">
+            <div class="eyebrow">Material Workspace</div>
+            <h2>{{ material.title }}</h2>
+            <p>
                 {{ material.course_code or 'No course code' }} · {{ material.filename }}
             </p>
         </div>
 
-        <div class="d-flex gap-2">
+        <div class="workspace-hero-actions">
             <a href="{{ url_for('main.review_material', material_id=material.id) }}"
                class="btn btn-outline-primary">
-                Review Text & Preferences
+                Review Text
             </a>
 
             {% if question_count > 0 %}
@@ -24,93 +25,178 @@
                    class="btn btn-primary">
                     Start Quiz
                 </a>
+            {% else %}
+                <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                   class="btn btn-primary">
+                    Generate Quiz
+                </a>
             {% endif %}
         </div>
     </div>
 
-    <div class="row g-4">
+    <div class="workspace-stat-grid">
+        <div class="workspace-stat-card">
+            <div class="workspace-stat-label">Generated Questions</div>
+            <div class="workspace-stat-value">{{ question_count }}</div>
+        </div>
 
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0 fw-semibold">Material Information</h5>
+        <div class="workspace-stat-card">
+            <div class="workspace-stat-label">Hot</div>
+            <div class="workspace-stat-value">{{ hot_count }}</div>
+        </div>
+
+        <div class="workspace-stat-card">
+            <div class="workspace-stat-label">Moderate</div>
+            <div class="workspace-stat-value">{{ moderate_count }}</div>
+        </div>
+
+        <div class="workspace-stat-card">
+            <div class="workspace-stat-label">Cold</div>
+            <div class="workspace-stat-value">{{ cold_count }}</div>
+        </div>
+    </div>
+
+    <div class="workspace-layout">
+
+        <div class="workspace-main">
+
+            <div class="card workspace-section-card">
+                <div class="card-header bg-white workspace-card-header">
+                    <div>
+                        <h5 class="mb-0 fw-semibold">Reviewed Extracted Text</h5>
+                        <p class="text-muted mb-0">This is the text TAPA uses to generate your quiz.</p>
+                    </div>
+
+                    <a href="{{ url_for('main.review_material', material_id=material.id) }}"
+                       class="btn btn-sm btn-outline-primary">
+                        Edit
+                    </a>
                 </div>
 
                 <div class="card-body">
-                    <div class="mb-3">
-                        <div class="text-muted small">Course Code</div>
-                        <strong>{{ material.course_code or '-' }}</strong>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="text-muted small">Question Count Preference</div>
-                        <strong>{{ material.question_count or 5 }}</strong>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="text-muted small">Difficulty Preference</div>
-                        <strong>{{ material.quiz_difficulty or 'All' }}</strong>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="text-muted small">Question Style</div>
-                        <strong>{{ material.question_style or 'MCQ' }}</strong>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="text-muted small">Generated Questions</div>
-                        <strong>{{ question_count }}</strong>
-                    </div>
-
-                    {% if material.quiz_focus %}
-                        <div>
-                            <div class="text-muted small">Quiz Focus</div>
-                            <p class="mb-0">{{ material.quiz_focus }}</p>
+                    {% if material.cleaned_text %}
+                        <pre class="workspace-text-preview">{{ material.cleaned_text }}</pre>
+                    {% elif material.extracted_text %}
+                        <pre class="workspace-text-preview">{{ material.extracted_text }}</pre>
+                    {% else %}
+                        <div class="empty-state compact">
+                            <h3>No extracted text available</h3>
+                            <p>Upload or review your material first.</p>
                         </div>
                     {% endif %}
                 </div>
             </div>
 
-            <div class="d-grid gap-2">
-                <a href="{{ url_for('main.review_material', material_id=material.id) }}"
-                   class="btn btn-outline-primary">
-                    Edit Review / Preferences
-                </a>
-
-                <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
-                   class="btn btn-primary">
-                    Generate / Regenerate Quiz
-                </a>
-
-                <a href="{{ url_for('main.dashboard') }}"
-                   class="btn btn-outline-secondary">
-                    Back to Dashboard
-                </a>
-            </div>
         </div>
 
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
+        <div class="workspace-side">
+
+            <div class="card workspace-section-card">
                 <div class="card-header bg-white">
-                    <h5 class="mb-0 fw-semibold">Reviewed Extracted Text</h5>
+                    <h5 class="mb-0 fw-semibold">Quiz Preferences</h5>
                 </div>
 
                 <div class="card-body">
-                    {% if material.cleaned_text %}
-                        <pre class="bg-light p-3 rounded border"
-                             style="white-space: pre-wrap; max-height: 600px; overflow-y: auto;">{{ material.cleaned_text }}</pre>
-                    {% elif material.extracted_text %}
-                        <pre class="bg-light p-3 rounded border"
-                             style="white-space: pre-wrap; max-height: 600px; overflow-y: auto;">{{ material.extracted_text }}</pre>
+                    <div class="workspace-info-row">
+                        <span>Course Code</span>
+                        <strong>{{ material.course_code or '-' }}</strong>
+                    </div>
+
+                    <div class="workspace-info-row">
+                        <span>Question Count</span>
+                        <strong>{{ material.question_count or 5 }}</strong>
+                    </div>
+
+                    <div class="workspace-info-row">
+                        <span>Difficulty</span>
+                        <strong>{{ material.quiz_difficulty or 'All' }}</strong>
+                    </div>
+
+                    <div class="workspace-info-row">
+                        <span>Question Style</span>
+                        <strong>{{ material.question_style or 'MCQ' }}</strong>
+                    </div>
+
+                    {% if material.quiz_focus %}
+                        <div class="workspace-focus-box">
+                            <span>Quiz Focus</span>
+                            <p>{{ material.quiz_focus }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card workspace-section-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-semibold">Actions</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="workspace-action-list">
+                        <a href="{{ url_for('main.review_material', material_id=material.id) }}"
+                           class="btn btn-outline-primary">
+                            Edit Review / Preferences
+                        </a>
+
+                        <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                           class="btn btn-primary">
+                            Generate / Regenerate Quiz
+                        </a>
+
+                        {% if question_count > 0 %}
+                            <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
+                               class="btn btn-outline-primary">
+                                Start Existing Quiz
+                            </a>
+                        {% endif %}
+
+                        <a href="{{ url_for('main.dashboard') }}"
+                           class="btn btn-outline-secondary">
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card workspace-section-card">
+                <div class="card-header bg-white workspace-card-header">
+                    <div>
+                        <h5 class="mb-0 fw-semibold">Recent Attempts</h5>
+                    </div>
+
+                    <a href="{{ url_for('main.history') }}"
+                       class="btn btn-sm btn-outline-primary">
+                        View All
+                    </a>
+                </div>
+
+                <div class="card-body">
+                    {% if recent_attempts %}
+                        <div class="workspace-attempt-list">
+                            {% for attempt in recent_attempts %}
+                                {% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
+                                <a href="{{ url_for('main.attempt_detail', attempt_id=attempt.id) }}"
+                                   class="workspace-attempt-item">
+                                    <div>
+                                        <strong>{{ attempt.level }}</strong>
+                                        <span>{{ attempt.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+                                    </div>
+
+                                    <div class="attempt-score-pill">
+                                        {{ attempt.score }}/{{ attempt.total_questions }}
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
                     {% else %}
                         <p class="text-muted mb-0">
-                            No extracted text available.
+                            No attempts yet. Start a quiz to create history.
                         </p>
                     {% endif %}
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
 {% endblock %}

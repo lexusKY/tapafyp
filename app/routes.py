@@ -219,10 +219,37 @@ def view_material(material_id):
 
     question_count = Question.query.filter_by(material_id=material.id).count()
 
+    hot_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Hot"
+    ).count()
+
+    moderate_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Moderate"
+    ).count()
+
+    cold_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Cold"
+    ).count()
+
+    recent_attempts = (
+        QuizAttempt.query
+        .filter_by(user_id=current_user.id, material_id=material.id)
+        .order_by(QuizAttempt.created_at.desc())
+        .limit(5)
+        .all()
+    )
+
     return render_template(
         "material_detail.html",
         material=material,
-        question_count=question_count
+        question_count=question_count,
+        hot_count=hot_count,
+        moderate_count=moderate_count,
+        cold_count=cold_count,
+        recent_attempts=recent_attempts
     )
 
 
