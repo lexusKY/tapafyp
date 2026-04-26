@@ -3,16 +3,114 @@
 {% block title %}Material Detail - TAPA{% endblock %}
 
 {% block content %}
-    <h2>{{ material.title }}</h2>
-    <p><strong>Filename:</strong> {{ material.filename }}</p>
+<div class="container py-4">
 
-    <h3>Extracted Text</h3>
-
-    {% if material.extracted_text %}
-        <div style="white-space: pre-wrap; border: 1px solid #ccc; padding: 15px; max-height: 500px; overflow-y: auto;">
-            {{ material.extracted_text }}
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">{{ material.title }}</h2>
+            <p class="text-muted mb-0">
+                {{ material.course_code or 'No course code' }} · {{ material.filename }}
+            </p>
         </div>
-    {% else %}
-        <p>No text extracted from this PDF.</p>
-    {% endif %}
+
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('main.review_material', material_id=material.id) }}"
+               class="btn btn-outline-primary">
+                Review Text & Preferences
+            </a>
+
+            {% if question_count > 0 %}
+                <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
+                   class="btn btn-primary">
+                    Start Quiz
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-semibold">Material Information</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="text-muted small">Course Code</div>
+                        <strong>{{ material.course_code or '-' }}</strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">Question Count Preference</div>
+                        <strong>{{ material.question_count or 5 }}</strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">Difficulty Preference</div>
+                        <strong>{{ material.quiz_difficulty or 'All' }}</strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">Question Style</div>
+                        <strong>{{ material.question_style or 'MCQ' }}</strong>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">Generated Questions</div>
+                        <strong>{{ question_count }}</strong>
+                    </div>
+
+                    {% if material.quiz_focus %}
+                        <div>
+                            <div class="text-muted small">Quiz Focus</div>
+                            <p class="mb-0">{{ material.quiz_focus }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <a href="{{ url_for('main.review_material', material_id=material.id) }}"
+                   class="btn btn-outline-primary">
+                    Edit Review / Preferences
+                </a>
+
+                <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                   class="btn btn-primary">
+                    Generate / Regenerate Quiz
+                </a>
+
+                <a href="{{ url_for('main.dashboard') }}"
+                   class="btn btn-outline-secondary">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-semibold">Reviewed Extracted Text</h5>
+                </div>
+
+                <div class="card-body">
+                    {% if material.cleaned_text %}
+                        <pre class="bg-light p-3 rounded border"
+                             style="white-space: pre-wrap; max-height: 600px; overflow-y: auto;">{{ material.cleaned_text }}</pre>
+                    {% elif material.extracted_text %}
+                        <pre class="bg-light p-3 rounded border"
+                             style="white-space: pre-wrap; max-height: 600px; overflow-y: auto;">{{ material.extracted_text }}</pre>
+                    {% else %}
+                        <p class="text-muted mb-0">
+                            No extracted text available.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
 {% endblock %}

@@ -12,10 +12,18 @@ from app.services.lecture_file_service import extract_text_from_file, combine_ex
 main = Blueprint("main", __name__)
 
 ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "html"}
+VALID_DIFFICULTIES = {"Hot", "Moderate", "Cold", "All"}
 
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def get_user_material_or_404(material_id):
+    return Material.query.filter_by(
+        id=material_id,
+        user_id=current_user.id
+    ).first_or_404()
 
 
 def load_style_profile(course_code, base_path):
@@ -49,7 +57,23 @@ def get_retry_questions(material_id, level):
 
     questions = Question.query.filter(Question.id.in_(question_ids)).all()
     question_map = {q.id: q for q in questions}
+
     return [question_map[qid] for qid in question_ids if qid in question_map]
+
+
+def safe_question_count(value):
+    try:
+        count = int(value)
+    except (TypeError, ValueError):
+        return 5
+
+    if count < 3:
+        return 3
+
+    if count > 20:
+        return 20
+
+    return count
 
 
 @main.route("/")
@@ -60,8 +84,29 @@ def index():
 @main.route("/dashboard")
 @login_required
 def dashboard():
-    materials = Material.query.order_by(Material.id.desc()).all()
-    return render_template("dashboard.html", user=current_user, materials=materials)
+    materials = (
+        Material.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Material.id.desc())
+        .all()
+    )
+
+    total_materials = len(materials)
+
+    total_questions = (
+        Question.query
+        .join(Material)
+        .filter(Material.user_id == current_user.id)
+        .count()
+    )
+
+    return render_template(
+        "dashboard.html",
+        user=current_user,
+        materials=materials,
+        total_materials=total_materials,
+        total_questions=total_questions
+    )
 
 
 @main.route("/upload", methods=["GET", "POST"])
@@ -120,17 +165,22 @@ def upload():
         combined_filename_text = ", ".join(saved_filenames)
 
         new_material = Material(
+            user_id=current_user.id,
             course_code=course_code,
             title=title,
             filename=combined_filename_text,
-            extracted_text=combined_text
+            extracted_text=combined_text,
+            cleaned_text=combined_text,
+            quiz_difficulty="All",
+            question_count=5,
+            question_style="MCQ"
         )
 
         db.session.add(new_material)
         db.session.commit()
 
-        flash("Lecture files uploaded and processed successfully.", "success")
-        return redirect(url_for("main.dashboard"))
+        flash("Lecture files uploaded and extracted successfully. Please review the extracted text before generating quiz.", "success")
+        return redirect(url_for("main.review_material", material_id=new_material.id))
 
     return render_template("upload.html")
 
@@ -138,23 +188,74 @@ def upload():
 @main.route("/material/<int:material_id>")
 @login_required
 def view_material(material_id):
-    material = Material.query.get_or_404(material_id)
-    return render_template("material_detail.html", material=material)
+    material = get_user_material_or_404(material_id)
+
+    question_count = Question.query.filter_by(material_id=material.id).count()
+
+    return render_template(
+        "material_detail.html",
+        material=material,
+        question_count=question_count
+    )
 
 
-@main.route("/generate-quiz/<int:material_id>", methods=["POST"])
+@main.route("/material/<int:material_id>/review", methods=["GET", "POST"])
+@login_required
+def review_material(material_id):
+    material = get_user_material_or_404(material_id)
+
+    if request.method == "POST":
+        cleaned_text = request.form.get("cleaned_text", "").strip()
+        quiz_difficulty = request.form.get("quiz_difficulty", "All").strip()
+        question_style = request.form.get("question_style", "MCQ").strip()
+        quiz_focus = request.form.get("quiz_focus", "").strip()
+        question_count = safe_question_count(request.form.get("question_count", 5))
+        action = request.form.get("action", "save")
+
+        if not cleaned_text:
+            flash("Cleaned extracted text cannot be empty.", "danger")
+            return redirect(url_for("main.review_material", material_id=material.id))
+
+        if quiz_difficulty not in VALID_DIFFICULTIES:
+            quiz_difficulty = "All"
+
+        material.cleaned_text = cleaned_text
+        material.quiz_difficulty = quiz_difficulty
+        material.question_count = question_count
+        material.question_style = question_style or "MCQ"
+        material.quiz_focus = quiz_focus or None
+
+        db.session.commit()
+
+        if action == "generate":
+            return redirect(url_for("main.generate_quiz", material_id=material.id))
+
+        flash("Material review and quiz preferences saved.", "success")
+        return redirect(url_for("main.view_material", material_id=material.id))
+
+    if not material.cleaned_text:
+        material.cleaned_text = material.extracted_text
+        db.session.commit()
+
+    return render_template("material_review.html", material=material)
+
+
+@main.route("/generate-quiz/<int:material_id>", methods=["GET", "POST"])
 @login_required
 def generate_quiz(material_id):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
 
-    if not material.extracted_text:
-        flash("This material has no extracted text to generate questions from.", "warning")
-        return redirect(url_for("main.dashboard"))
+    source_text = material.cleaned_text or material.extracted_text
+
+    if not source_text:
+        flash("This material has no text to generate questions from.", "warning")
+        return redirect(url_for("main.review_material", material_id=material.id))
 
     gemini_api_key = current_app.config.get("GEMINI_API_KEY")
+
     if not gemini_api_key:
         flash("Gemini API key is missing.", "danger")
-        return redirect(url_for("main.dashboard"))
+        return redirect(url_for("main.review_material", material_id=material.id))
 
     style_profile_text = load_style_profile(
         material.course_code,
@@ -170,15 +271,19 @@ def generate_quiz(material_id):
     db.session.commit()
 
     generated_questions = generate_mcqs_from_text(
-        material.extracted_text,
+        source_text,
         gemini_api_key,
         course_code=material.course_code,
-        style_profile_text=style_profile_text
+        style_profile_text=style_profile_text,
+        question_count=material.question_count or 5,
+        quiz_difficulty=material.quiz_difficulty or "All",
+        question_style=material.question_style or "MCQ",
+        quiz_focus=material.quiz_focus
     )
 
     if not generated_questions:
         flash("Failed to generate quiz questions.", "danger")
-        return redirect(url_for("main.dashboard"))
+        return redirect(url_for("main.review_material", material_id=material.id))
 
     for q in generated_questions:
         new_question = Question(
@@ -189,6 +294,7 @@ def generate_quiz(material_id):
             hint=q.get("hint", ""),
             explanation=q.get("explanation", "")
         )
+
         db.session.add(new_question)
         db.session.flush()
 
@@ -198,6 +304,7 @@ def generate_quiz(material_id):
                 choice_text=c["choice_text"],
                 is_correct=c["is_correct"]
             )
+
             db.session.add(new_choice)
 
     db.session.commit()
@@ -209,16 +316,28 @@ def generate_quiz(material_id):
 @main.route("/choose-level/<int:material_id>")
 @login_required
 def choose_level(material_id):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
     questions = Question.query.filter_by(material_id=material.id).all()
 
     if not questions:
         flash("No quiz questions generated yet.", "warning")
-        return redirect(url_for("main.dashboard"))
+        return redirect(url_for("main.review_material", material_id=material.id))
 
-    hot_count = Question.query.filter_by(material_id=material.id, difficulty="Hot").count()
-    moderate_count = Question.query.filter_by(material_id=material.id, difficulty="Moderate").count()
-    cold_count = Question.query.filter_by(material_id=material.id, difficulty="Cold").count()
+    hot_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Hot"
+    ).count()
+
+    moderate_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Moderate"
+    ).count()
+
+    cold_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Cold"
+    ).count()
+
     all_count = len(questions)
 
     return render_template(
@@ -234,7 +353,12 @@ def choose_level(material_id):
 @main.route("/start-quiz/<int:material_id>/<level>")
 @login_required
 def start_quiz(material_id, level):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
+
+    if level not in VALID_DIFFICULTIES:
+        flash("Invalid difficulty level.", "danger")
+        return redirect(url_for("main.choose_level", material_id=material.id))
+
     questions = get_filtered_questions(material.id, level)
 
     if not questions:
@@ -245,13 +369,23 @@ def start_quiz(material_id, level):
     session.pop(f"retry_{material_id}_{level}_question_ids", None)
     session.pop(f"retry_{material_id}_{level}_answers", None)
 
-    return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=1))
+    return redirect(url_for(
+        "main.quiz_question",
+        material_id=material.id,
+        level=level,
+        question_number=1
+    ))
 
 
 @main.route("/quiz/<int:material_id>/<level>/<int:question_number>", methods=["GET", "POST"])
 @login_required
 def quiz_question(material_id, level, question_number):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
+
+    if level not in VALID_DIFFICULTIES:
+        flash("Invalid difficulty level.", "danger")
+        return redirect(url_for("main.choose_level", material_id=material.id))
+
     questions = get_filtered_questions(material.id, level)
 
     if not questions:
@@ -270,7 +404,11 @@ def quiz_question(material_id, level, question_number):
     selected_answer = answers.get(str(current_question.id))
     feedback_mode = False
     feedback_correct = False
-    correct_choice = Choice.query.filter_by(question_id=current_question.id, is_correct=True).first()
+
+    correct_choice = Choice.query.filter_by(
+        question_id=current_question.id,
+        is_correct=True
+    ).first()
 
     if request.method == "POST":
         action = request.form.get("action", "check")
@@ -280,7 +418,12 @@ def quiz_question(material_id, level, question_number):
 
             if not selected_choice_id:
                 flash("Please select an answer before checking.", "warning")
-                return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=question_number))
+                return redirect(url_for(
+                    "main.quiz_question",
+                    material_id=material.id,
+                    level=level,
+                    question_number=question_number
+                ))
 
             answers[str(current_question.id)] = int(selected_choice_id)
             session[session_key] = answers
@@ -293,9 +436,18 @@ def quiz_question(material_id, level, question_number):
             next_question_number = question_number + 1
 
             if next_question_number > total_questions:
-                return redirect(url_for("main.quiz_result", material_id=material.id, level=level))
+                return redirect(url_for(
+                    "main.quiz_result",
+                    material_id=material.id,
+                    level=level
+                ))
 
-            return redirect(url_for("main.quiz_question", material_id=material.id, level=level, question_number=next_question_number))
+            return redirect(url_for(
+                "main.quiz_question",
+                material_id=material.id,
+                level=level,
+                question_number=next_question_number
+            ))
 
     return render_template(
         "quiz_question.html",
@@ -314,7 +466,12 @@ def quiz_question(material_id, level, question_number):
 @main.route("/quiz-result/<int:material_id>/<level>")
 @login_required
 def quiz_result(material_id, level):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
+
+    if level not in VALID_DIFFICULTIES:
+        flash("Invalid difficulty level.", "danger")
+        return redirect(url_for("main.choose_level", material_id=material.id))
+
     questions = get_filtered_questions(material.id, level)
 
     session_key = f"quiz_{material_id}_{level}_answers"
@@ -325,7 +482,11 @@ def quiz_result(material_id, level):
     wrong_question_ids = []
 
     for question in questions:
-        correct_choice = Choice.query.filter_by(question_id=question.id, is_correct=True).first()
+        correct_choice = Choice.query.filter_by(
+            question_id=question.id,
+            is_correct=True
+        ).first()
+
         selected_choice_id = answers.get(str(question.id))
         selected_choice = Choice.query.get(selected_choice_id) if selected_choice_id else None
 
@@ -366,21 +527,41 @@ def quiz_result(material_id, level):
 @main.route("/retry-wrong/<int:material_id>/<level>")
 @login_required
 def retry_wrong(material_id, level):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
+
+    if level not in VALID_DIFFICULTIES:
+        flash("Invalid difficulty level.", "danger")
+        return redirect(url_for("main.choose_level", material_id=material.id))
+
     questions = get_retry_questions(material.id, level)
 
     if not questions:
         flash("No wrong questions available to retry.", "warning")
-        return redirect(url_for("main.quiz_result", material_id=material.id, level=level))
+        return redirect(url_for(
+            "main.quiz_result",
+            material_id=material.id,
+            level=level
+        ))
 
     session[f"retry_{material_id}_{level}_answers"] = {}
-    return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=1))
+
+    return redirect(url_for(
+        "main.retry_question",
+        material_id=material.id,
+        level=level,
+        question_number=1
+    ))
 
 
 @main.route("/retry-quiz/<int:material_id>/<level>/<int:question_number>", methods=["GET", "POST"])
 @login_required
 def retry_question(material_id, level, question_number):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
+
+    if level not in VALID_DIFFICULTIES:
+        flash("Invalid difficulty level.", "danger")
+        return redirect(url_for("main.choose_level", material_id=material.id))
+
     questions = get_retry_questions(material.id, level)
 
     if not questions:
@@ -390,7 +571,11 @@ def retry_question(material_id, level, question_number):
     total_questions = len(questions)
 
     if question_number < 1 or question_number > total_questions:
-        return redirect(url_for("main.retry_result", material_id=material.id, level=level))
+        return redirect(url_for(
+            "main.retry_result",
+            material_id=material.id,
+            level=level
+        ))
 
     current_question = questions[question_number - 1]
     session_key = f"retry_{material_id}_{level}_answers"
@@ -399,7 +584,11 @@ def retry_question(material_id, level, question_number):
     selected_answer = answers.get(str(current_question.id))
     feedback_mode = False
     feedback_correct = False
-    correct_choice = Choice.query.filter_by(question_id=current_question.id, is_correct=True).first()
+
+    correct_choice = Choice.query.filter_by(
+        question_id=current_question.id,
+        is_correct=True
+    ).first()
 
     if request.method == "POST":
         action = request.form.get("action", "check")
@@ -409,7 +598,12 @@ def retry_question(material_id, level, question_number):
 
             if not selected_choice_id:
                 flash("Please select an answer before checking.", "warning")
-                return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=question_number))
+                return redirect(url_for(
+                    "main.retry_question",
+                    material_id=material.id,
+                    level=level,
+                    question_number=question_number
+                ))
 
             answers[str(current_question.id)] = int(selected_choice_id)
             session[session_key] = answers
@@ -422,9 +616,18 @@ def retry_question(material_id, level, question_number):
             next_question_number = question_number + 1
 
             if next_question_number > total_questions:
-                return redirect(url_for("main.retry_result", material_id=material.id, level=level))
+                return redirect(url_for(
+                    "main.retry_result",
+                    material_id=material.id,
+                    level=level
+                ))
 
-            return redirect(url_for("main.retry_question", material_id=material.id, level=level, question_number=next_question_number))
+            return redirect(url_for(
+                "main.retry_question",
+                material_id=material.id,
+                level=level,
+                question_number=next_question_number
+            ))
 
     return render_template(
         "quiz_question.html",
@@ -443,7 +646,12 @@ def retry_question(material_id, level, question_number):
 @main.route("/retry-result/<int:material_id>/<level>")
 @login_required
 def retry_result(material_id, level):
-    material = Material.query.get_or_404(material_id)
+    material = get_user_material_or_404(material_id)
+
+    if level not in VALID_DIFFICULTIES:
+        flash("Invalid difficulty level.", "danger")
+        return redirect(url_for("main.choose_level", material_id=material.id))
+
     questions = get_retry_questions(material.id, level)
 
     session_key = f"retry_{material_id}_{level}_answers"
@@ -453,7 +661,11 @@ def retry_result(material_id, level):
     results = []
 
     for question in questions:
-        correct_choice = Choice.query.filter_by(question_id=question.id, is_correct=True).first()
+        correct_choice = Choice.query.filter_by(
+            question_id=question.id,
+            is_correct=True
+        ).first()
+
         selected_choice_id = answers.get(str(question.id))
         selected_choice = Choice.query.get(selected_choice_id) if selected_choice_id else None
 
@@ -486,6 +698,48 @@ def retry_result(material_id, level):
     )
 
 
+@main.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    if request.method == "POST":
+        current_user.full_name = request.form.get("full_name", "").strip() or None
+        current_user.student_id = request.form.get("student_id", "").strip() or None
+        current_user.programme = request.form.get("programme", "").strip() or None
+        current_user.faculty = request.form.get("faculty", "").strip() or None
+        current_user.year_of_study = request.form.get("year_of_study", "").strip() or None
+
+        db.session.commit()
+
+        flash("Student profile updated successfully.", "success")
+        return redirect(url_for("main.profile"))
+
+    materials = (
+        Material.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Material.id.desc())
+        .all()
+    )
+
+    total_materials = len(materials)
+
+    total_questions = (
+        Question.query
+        .join(Material)
+        .filter(Material.user_id == current_user.id)
+        .count()
+    )
+
+    recent_materials = materials[:5]
+
+    return render_template(
+        "profile.html",
+        user=current_user,
+        total_materials=total_materials,
+        total_questions=total_questions,
+        recent_materials=recent_materials
+    )
+
+
 @main.route("/course-style")
 @login_required
 def course_style_page():
@@ -502,13 +756,18 @@ def generate_style_profile_route():
         return redirect(url_for("main.course_style_page"))
 
     gemini_api_key = current_app.config.get("GEMINI_API_KEY")
+
     if not gemini_api_key:
         flash("Gemini API key is missing.", "danger")
         return redirect(url_for("main.course_style_page"))
 
     base_path = current_app.config["PAST_PAPERS_FOLDER"]
 
-    success, result = build_style_profile_for_course(course_code, base_path, gemini_api_key)
+    success, result = build_style_profile_for_course(
+        course_code,
+        base_path,
+        gemini_api_key
+    )
 
     if success:
         flash(f"Style profile generated successfully for {course_code}.", "success")
@@ -522,6 +781,7 @@ def generate_style_profile_route():
 @login_required
 def view_style_profile(course_code):
     course_code = course_code.upper()
+
     profile_path = os.path.join(
         current_app.config["PAST_PAPERS_FOLDER"],
         course_code,

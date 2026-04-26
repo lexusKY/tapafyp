@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Review Extracted Text - TAPA{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Review Extracted Text</h2>
+            <p class="text-muted mb-0">
+                Check and clean the extracted content before generating your quiz.
+            </p>
+        </div>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Tip:</strong> If tables or formulas look messy, you can manually clean them here before quiz generation.
+        TAPA will use this reviewed text instead of the raw extracted text.
+    </div>
+
+    <form method="POST" action="{{ url_for('main.review_material', material_id=material.id) }}">
+
+        <div class="row g-4">
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0 fw-semibold">Extracted Text Editor</h5>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Material Title</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ material.title }}"
+                                   disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Uploaded File(s)</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ material.filename }}"
+                                   disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Reviewed / Cleaned Extracted Text</label>
+                            <textarea name="cleaned_text"
+                                      class="form-control font-monospace"
+                                      rows="24"
+                                      required>{{ material.cleaned_text or material.extracted_text or '' }}</textarea>
+                            <div class="form-text">
+                                You may edit this text to fix table, formula, spacing, or extraction problems.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0 fw-semibold">Quiz Preferences</h5>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+                            <label class="form-label">Course Code</label>
+                            <input type="text"
+                                   class="form-control"
+                                   value="{{ material.course_code or '' }}"
+                                   disabled>
+                            <div class="form-text">
+                                Course code is stored per uploaded material.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Number of Questions</label>
+                            <select name="question_count" class="form-select">
+                                {% for count in [5, 10, 15, 20] %}
+                                    <option value="{{ count }}"
+                                            {% if material.question_count == count %}selected{% endif %}>
+                                        {{ count }} questions
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Difficulty</label>
+                            <select name="quiz_difficulty" class="form-select">
+                                <option value="All" {% if material.quiz_difficulty == "All" or not material.quiz_difficulty %}selected{% endif %}>Mixed Difficulty</option>
+                                <option value="Hot" {% if material.quiz_difficulty == "Hot" %}selected{% endif %}>Hot</option>
+                                <option value="Moderate" {% if material.quiz_difficulty == "Moderate" %}selected{% endif %}>Moderate</option>
+                                <option value="Cold" {% if material.quiz_difficulty == "Cold" %}selected{% endif %}>Cold</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Question Style</label>
+                            <select name="question_style" class="form-select">
+                                <option value="MCQ" {% if material.question_style == "MCQ" or not material.question_style %}selected{% endif %}>MCQ</option>
+                                <option value="Exam-style MCQ" {% if material.question_style == "Exam-style MCQ" %}selected{% endif %}>Exam-style MCQ</option>
+                                <option value="Concept-check MCQ" {% if material.question_style == "Concept-check MCQ" %}selected{% endif %}>Concept-check MCQ</option>
+                                <option value="Application-based MCQ" {% if material.question_style == "Application-based MCQ" %}selected{% endif %}>Application-based MCQ</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Quiz Focus</label>
+                            <textarea name="quiz_focus"
+                                      class="form-control"
+                                      rows="5"
+                                      placeholder="Example: Focus more on calculations, formulas, tables, or Topic 3.">{{ material.quiz_focus or '' }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit"
+                                    name="action"
+                                    value="save"
+                                    class="btn btn-outline-primary">
+                                Save Review
+                            </button>
+
+                            <button type="submit"
+                                    name="action"
+                                    value="generate"
+                                    class="btn btn-primary">
+                                Save & Generate Quiz
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0 fw-semibold">What happens next?</h6>
+                    </div>
+                    <div class="card-body">
+                        <ol class="small text-muted mb-0">
+                            <li>TAPA saves your reviewed extracted text.</li>
+                            <li>Your quiz preferences are stored with this material.</li>
+                            <li>The AI generates MCQs based on the cleaned text.</li>
+                            <li>You can start answering the quiz by difficulty level.</li>
+                        </ol>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

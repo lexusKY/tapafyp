@@ -3,34 +3,127 @@
 {% block title %}Dashboard - TAPA{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <div class="page-title">Dashboard</div>
-        <div class="page-subtitle">Welcome, {{ user.username }}.</div>
+<div class="container py-4">
 
-        <a class="upload-link" href="{{ url_for('main.upload') }}">Upload Lecture Files</a>
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Dashboard</h2>
+            <p class="text-muted mb-0">
+                Welcome back, {{ user.full_name or user.username }}. Manage your uploaded learning materials here.
+            </p>
+        </div>
 
-        <h3>Uploaded Revision Sets</h3>
-
-        {% if materials %}
-            <ul>
-                {% for material in materials %}
-                    <li style="margin-bottom: 16px;">
-                        <strong>{{ material.course_code or 'NO CODE' }}</strong> -
-                        <strong>{{ material.title }}</strong> -
-                        {{ material.filename }}
-                        |
-                        <a href="{{ url_for('main.view_material', material_id=material.id) }}">View Extracted Text</a>
-                        |
-                        <a href="{{ url_for('main.choose_level', material_id=material.id) }}">Choose Level</a>
-
-                        <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}" class="quiz-generate-form">
-                            <button type="submit" class="quiz-generate-btn">Generate Interactive Quiz</button>
-                        </form>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No uploaded revision sets yet.</p>
-        {% endif %}
+        <a href="{{ url_for('main.upload') }}" class="btn btn-primary">
+            Upload New Material
+        </a>
     </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="text-muted small">Uploaded Materials</div>
+                    <h3 class="fw-bold mb-0">{{ total_materials }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="text-muted small">Generated Questions</div>
+                    <h3 class="fw-bold mb-0">{{ total_questions }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5 class="mb-0 fw-semibold">Your Materials</h5>
+        </div>
+
+        <div class="card-body">
+            {% if materials %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Course</th>
+                                <th>Files</th>
+                                <th>Quiz Preference</th>
+                                <th>Uploaded</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for material in materials %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ material.title }}</strong>
+                                    </td>
+
+                                    <td>
+                                        {{ material.course_code or '-' }}
+                                    </td>
+
+                                    <td>
+                                        <span class="text-muted small">{{ material.filename }}</span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ material.question_count or 5 }} Qs
+                                        </span>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ material.quiz_difficulty or 'All' }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        {% if material.uploaded_at %}
+                                            {{ material.uploaded_at.strftime('%d %b %Y') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a href="{{ url_for('main.view_material', material_id=material.id) }}"
+                                           class="btn btn-sm btn-outline-secondary">
+                                            View
+                                        </a>
+
+                                        <a href="{{ url_for('main.review_material', material_id=material.id) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Review
+                                        </a>
+
+                                        <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                                           class="btn btn-sm btn-primary">
+                                            Generate Quiz
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <h5 class="fw-semibold">No materials uploaded yet</h5>
+                    <p class="text-muted">
+                        Upload your first lecture notes to start generating personalised quiz questions.
+                    </p>
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-primary">
+                        Upload Material
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
 {% endblock %}
