@@ -31,7 +31,11 @@
                     Start Quiz
                 </a>
             {% else %}
-                <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}" class="inline-action-form">
+                <form method="POST"
+                    action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                    class="inline-action-form"
+                    data-loading="true"
+                    data-loading-type="generate">
                     <button type="submit" class="btn btn-primary">
                         Generate Quiz
                     </button>
@@ -144,7 +148,10 @@
                             Edit Review / Preferences
                         </a>
 
-                        <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}">
+                        <form method="POST"
+                            action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                            data-loading="true"
+                            data-loading-type="generate">
                             <button type="submit" class="btn btn-primary w-100">
                                 Generate / Regenerate Quiz
                             </button>
@@ -159,6 +166,11 @@
                             <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
                             class="btn btn-outline-primary">
                                 Start Existing Quiz
+                            </a>
+
+                            <a href="{{ url_for('main.material_attempts', material_id=material.id) }}"
+                            class="btn btn-outline-primary">
+                                View Material Attempts
                             </a>
                         {% endif %}
 
@@ -184,8 +196,8 @@
                         <h5 class="mb-0 fw-semibold">Recent Attempts</h5>
                     </div>
 
-                    <a href="{{ url_for('main.history') }}"
-                       class="btn btn-sm btn-outline-primary">
+                    <a href="{{ url_for('main.material_attempts', material_id=material.id) }}"
+                        class="btn btn-sm btn-outline-primary">
                         View All
                     </a>
                 </div>

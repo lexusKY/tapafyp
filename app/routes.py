@@ -911,6 +911,43 @@ def history():
 
     return render_template("history.html", attempts=attempts)
 
+@main.route("/material/<int:material_id>/attempts")
+@login_required
+def material_attempts(material_id):
+    material = get_user_material_or_404(material_id)
+
+    attempts = (
+        QuizAttempt.query
+        .filter_by(user_id=current_user.id, material_id=material.id)
+        .order_by(QuizAttempt.created_at.desc())
+        .all()
+    )
+
+    total_attempts = len(attempts)
+
+    best_attempt = None
+    if attempts:
+        best_attempt = max(
+            attempts,
+            key=lambda attempt: (
+                attempt.score / attempt.total_questions
+                if attempt.total_questions > 0 else 0
+            )
+        )
+
+    normal_count = sum(1 for attempt in attempts if attempt.attempt_type == "normal")
+    retry_count = sum(1 for attempt in attempts if attempt.attempt_type == "retry")
+
+    return render_template(
+        "material_attempts.html",
+        material=material,
+        attempts=attempts,
+        total_attempts=total_attempts,
+        best_attempt=best_attempt,
+        normal_count=normal_count,
+        retry_count=retry_count
+    )
+
 
 @main.route("/attempt/<int:attempt_id>")
 @login_required

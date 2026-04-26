@@ -3100,3 +3100,160 @@ button.is-loading {
     overflow-wrap: anywhere;
     word-break: break-word;
 }
+
+/* ============================================================
+   Material-Specific Attempts Page
+   ============================================================ */
+
+.material-attempts-page {
+    max-width: 1120px;
+    margin: 0 auto;
+}
+
+.material-attempts-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding: 34px;
+    margin-bottom: 18px;
+    border-radius: var(--r-2xl);
+    background: var(--grad-banner);
+    box-shadow: var(--shadow-hover);
+}
+
+.material-attempts-hero::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -70px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.material-attempts-hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+.material-attempts-hero .eyebrow,
+.material-attempts-hero h2,
+.material-attempts-hero p {
+    color: #ffffff;
+}
+
+.material-attempts-hero .eyebrow {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.material-attempts-hero h2 {
+    margin-bottom: 8px;
+}
+
+.material-attempts-hero p {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.material-attempts-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.material-attempts-actions .btn-outline-primary {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+.material-attempts-actions .btn-outline-primary:hover {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+.material-attempts-actions .btn-primary {
+    background: #ffffff;
+    color: var(--v-600);
+    box-shadow: none;
+}
+
+.material-attempts-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.material-attempts-stat-card {
+    padding: 18px;
+    border-radius: var(--r-xl);
+    background: rgba(255, 255, 255, 0.94);
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-card);
+}
+
+.material-attempts-stat-card span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ink-500);
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.material-attempts-stat-card strong {
+    color: var(--ink-900);
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+}
+
+.attempt-mini-progress {
+    width: 120px;
+    max-width: 100%;
+    height: 8px;
+    overflow: hidden;
+    border-radius: var(--r-pill);
+    background: var(--v-100);
+}
+
+.attempt-mini-progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: var(--r-pill);
+    background: var(--grad-primary);
+    transition: width 0.35s var(--ease);
+}
+
+@media (max-width: 900px) {
+    .material-attempts-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .material-attempts-actions {
+        justify-content: flex-start;
+    }
+
+    .material-attempts-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .material-attempts-stat-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .material-attempts-hero {
+        padding: 24px;
+    }
+}

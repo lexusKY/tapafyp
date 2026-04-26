@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Material Attempts - TAPA{% endblock %}
+
+{% block content %}
+<div class="material-attempts-page">
+
+    <div class="material-attempts-hero">
+        <div>
+            <div class="eyebrow">Material Quiz History</div>
+            <h2>{{ material.title }}</h2>
+            <p>
+                View all saved quiz attempts for {{ material.course_code or 'this material' }}.
+            </p>
+        </div>
+
+        <div class="material-attempts-actions">
+            <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
+               class="btn btn-primary">
+                Start Quiz
+            </a>
+
+            <a href="{{ url_for('main.view_material', material_id=material.id) }}"
+               class="btn btn-outline-primary">
+                Back to Material
+            </a>
+        </div>
+    </div>
+
+    <div class="material-attempts-stat-grid">
+        <div class="material-attempts-stat-card">
+            <span>Total Attempts</span>
+            <strong>{{ total_attempts }}</strong>
+        </div>
+
+        <div class="material-attempts-stat-card">
+            <span>Normal Attempts</span>
+            <strong>{{ normal_count }}</strong>
+        </div>
+
+        <div class="material-attempts-stat-card">
+            <span>Retry Attempts</span>
+            <strong>{{ retry_count }}</strong>
+        </div>
+
+        <div class="material-attempts-stat-card">
+            <span>Best Score</span>
+            {% if best_attempt %}
+                {% set best_percentage = (best_attempt.score / best_attempt.total_questions * 100) | round(0) if best_attempt.total_questions > 0 else 0 %}
+                <strong>{{ best_percentage }}%</strong>
+            {% else %}
+                <strong>-</strong>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h5 class="mb-0 fw-semibold">Attempts for This Material</h5>
+        </div>
+
+        <div class="card-body">
+            {% if attempts %}
+                <div class="table-responsive">
+                    <table class="table align-middle material-attempts-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Level</th>
+                                <th>Type</th>
+                                <th>Score</th>
+                                <th>Percentage</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for attempt in attempts %}
+                                {% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
+
+                                <tr>
+                                    <td>
+                                        <strong>{{ attempt.created_at.strftime('%d %b %Y') }}</strong>
+                                        <div class="text-muted small">
+                                            {{ attempt.created_at.strftime('%I:%M %p') }}
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ attempt.level }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        {% if attempt.attempt_type == "retry" %}
+                                            <span class="status-pill status-wrong">Retry</span>
+                                        {% else %}
+                                            <span class="status-pill status-correct">Normal</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <strong>{{ attempt.score }}/{{ attempt.total_questions }}</strong>
+                                    </td>
+
+                                    <td>
+                                        <div class="attempt-mini-progress">
+                                            <div class="attempt-mini-progress-fill"
+                                                 data-width="{{ percentage }}">
+                                            </div>
+                                        </div>
+                                        <div class="text-muted small mt-1">
+                                            {{ percentage }}%
+                                        </div>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a href="{{ url_for('main.attempt_detail', attempt_id=attempt.id) }}"
+                                           class="btn btn-sm btn-primary">
+                                            View Result
+                                        </a>
+
+                                        <form method="POST"
+                                              action="{{ url_for('main.delete_attempt', attempt_id=attempt.id) }}"
+                                              class="inline-delete-form"
+                                              onsubmit="return confirm('Delete this quiz attempt?');">
+                                            <button type="submit" class="btn btn-sm btn-danger-outline">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No attempts for this material yet</h3>
+                    <p>Start a quiz and your attempt history will appear here.</p>
+                    <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
+                       class="btn btn-primary">
+                        Start Quiz
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".attempt-mini-progress-fill").forEach(function (bar) {
+            const width = bar.getAttribute("data-width") || "0";
+            bar.style.width = width + "%";
+        });
+    });
+</script>
+{% endblock %}
