@@ -2648,3 +2648,351 @@ button:not(.btn):hover {
     font-size: 0.82rem;
     font-weight: 700;
 }
+
+/* ============================================================
+   Global Animated Loading Overlay
+   ============================================================ */
+
+.loading-active {
+    overflow: hidden;
+}
+
+.tapa-loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        radial-gradient(circle at top left, rgba(108, 92, 231, 0.28), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(0, 201, 167, 0.22), transparent 34%),
+        rgba(247, 247, 252, 0.78);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms var(--ease);
+}
+
+.tapa-loading-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.tapa-loading-card {
+    position: relative;
+    width: min(720px, 100%);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 28px;
+    align-items: center;
+    padding: 34px;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1.5px solid rgba(108, 92, 231, 0.18);
+    box-shadow:
+        0 24px 70px rgba(108, 92, 231, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    overflow: hidden;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 260ms var(--ease);
+}
+
+.tapa-loading-overlay.show .tapa-loading-card {
+    transform: translateY(0) scale(1);
+}
+
+.tapa-loading-card::before {
+    content: "";
+    position: absolute;
+    top: -90px;
+    right: -80px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: rgba(108, 92, 231, 0.10);
+}
+
+.tapa-loading-card::after {
+    content: "";
+    position: absolute;
+    bottom: -110px;
+    left: -80px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: rgba(0, 201, 167, 0.10);
+}
+
+.tapa-loader-scene,
+.tapa-loading-content {
+    position: relative;
+    z-index: 1;
+}
+
+.tapa-loader-scene {
+    width: 170px;
+    height: 170px;
+    display: grid;
+    place-items: center;
+}
+
+.tapa-loader-logo {
+    width: 86px;
+    height: 86px;
+    display: grid;
+    place-items: center;
+    border-radius: 28px;
+    background: var(--grad-primary);
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: 900;
+    box-shadow:
+        0 18px 40px rgba(108, 92, 231, 0.34),
+        0 0 0 10px rgba(108, 92, 231, 0.08);
+    animation: tapaLogoPulse 1.8s ease-in-out infinite;
+}
+
+.tapa-orbit {
+    position: absolute;
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    border: 2px dashed rgba(108, 92, 231, 0.28);
+    animation: tapaOrbitSpin 8s linear infinite;
+}
+
+.tapa-orbit::before,
+.tapa-orbit::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+}
+
+.tapa-orbit::before {
+    top: 8px;
+    left: 20px;
+    background: var(--m-400);
+    box-shadow: 0 0 18px rgba(0, 201, 167, 0.55);
+}
+
+.tapa-orbit::after {
+    right: 10px;
+    bottom: 26px;
+    background: var(--a-400);
+    box-shadow: 0 0 18px rgba(255, 186, 0, 0.55);
+}
+
+.tapa-spark {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--v-500);
+    opacity: 0.75;
+    animation: tapaSparkFloat 2.2s ease-in-out infinite;
+}
+
+.spark-one {
+    top: 20px;
+    right: 30px;
+}
+
+.spark-two {
+    left: 20px;
+    bottom: 38px;
+    animation-delay: 0.4s;
+    background: var(--m-400);
+}
+
+.spark-three {
+    right: 42px;
+    bottom: 18px;
+    animation-delay: 0.8s;
+    background: var(--r-400);
+}
+
+.tapa-loading-eyebrow {
+    margin-bottom: 8px;
+    color: var(--v-500);
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.tapa-loading-content h2 {
+    margin-bottom: 10px;
+    font-size: clamp(1.55rem, 3vw, 2.2rem);
+}
+
+.tapa-loading-content p {
+    margin: 0;
+    color: var(--ink-500);
+}
+
+.tapa-loading-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 22px 0 16px;
+}
+
+.loading-step {
+    padding: 7px 11px;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--ink-500);
+    font-size: 0.74rem;
+    font-weight: 800;
+    transition: 180ms var(--ease);
+}
+
+.loading-step.active {
+    background: var(--v-100);
+    color: var(--v-700);
+    border-color: rgba(108, 92, 231, 0.25);
+    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.12);
+}
+
+.tapa-loading-bar {
+    position: relative;
+    height: 10px;
+    overflow: hidden;
+    border-radius: var(--r-pill);
+    background: var(--v-100);
+}
+
+.tapa-loading-bar-fill {
+    position: absolute;
+    inset: 0;
+    width: 42%;
+    border-radius: var(--r-pill);
+    background: linear-gradient(90deg, var(--v-500), var(--m-400), var(--v-400));
+    animation: tapaLoadingSlide 1.55s ease-in-out infinite;
+}
+
+.tapa-loading-tip {
+    margin-top: 14px !important;
+    padding: 12px 14px;
+    border-radius: var(--r-lg);
+    background: var(--m-50);
+    color: var(--m-700) !important;
+    border-left: 4px solid var(--m-400);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+button.is-loading {
+    opacity: 0.78;
+    cursor: wait;
+}
+
+@keyframes tapaOrbitSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes tapaLogoPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow:
+            0 18px 40px rgba(108, 92, 231, 0.34),
+            0 0 0 10px rgba(108, 92, 231, 0.08);
+    }
+    50% {
+        transform: scale(1.06);
+        box-shadow:
+            0 22px 48px rgba(108, 92, 231, 0.42),
+            0 0 0 16px rgba(108, 92, 231, 0.08);
+    }
+}
+
+@keyframes tapaSparkFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.55;
+    }
+    50% {
+        transform: translateY(-12px) scale(1.25);
+        opacity: 1;
+    }
+}
+
+@keyframes tapaLoadingSlide {
+    0% {
+        transform: translateX(-110%);
+    }
+    50% {
+        transform: translateX(70%);
+    }
+    100% {
+        transform: translateX(250%);
+    }
+}
+
+@media (max-width: 720px) {
+    .tapa-loading-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 28px;
+    }
+
+    .tapa-loader-scene {
+        margin: 0 auto;
+    }
+
+    .tapa-loading-steps {
+        justify-content: center;
+    }
+
+    .tapa-loading-tip {
+        text-align: left;
+    }
+}
+
+/* ============================================================
+   Long Quiz Text / Code Wrapping Fix
+   ============================================================ */
+
+.quiz-question-text,
+.question-bank-card h3,
+.result-review-card h3 {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.quiz-card {
+    overflow: hidden;
+}
+
+.modern-choice,
+.qb-choice,
+.answer-box,
+.explanation-box,
+.hint-box,
+.feedback-box {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.modern-choice span,
+.qb-choice-text,
+.answer-box strong,
+.explanation-box p,
+.hint-box,
+.feedback-box p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}

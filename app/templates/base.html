@@ -23,6 +23,40 @@
         {% endif %}
     </nav>
 
+    <div id="tapa-loading-overlay" class="tapa-loading-overlay" aria-hidden="true">
+        <div class="tapa-loading-card">
+            <div class="tapa-loader-scene">
+                <div class="tapa-orbit"></div>
+                <div class="tapa-loader-logo">T</div>
+                <div class="tapa-spark spark-one"></div>
+                <div class="tapa-spark spark-two"></div>
+                <div class="tapa-spark spark-three"></div>
+            </div>
+
+            <div class="tapa-loading-content">
+                <div class="tapa-loading-eyebrow">TAPA is working</div>
+                <h2 id="tapa-loading-title">Processing your request...</h2>
+                <p id="tapa-loading-message">
+                    Please keep this page open while TAPA completes the task.
+                </p>
+
+                <div class="tapa-loading-steps">
+                    <span class="loading-step active">Reading notes</span>
+                    <span class="loading-step">Cleaning content</span>
+                    <span class="loading-step">Generating quiz</span>
+                </div>
+
+                <div class="tapa-loading-bar">
+                    <div class="tapa-loading-bar-fill"></div>
+                </div>
+
+                <p class="tapa-loading-tip" id="tapa-loading-tip">
+                    Tip: Cleaner extracted text helps TAPA generate better MCQs.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <div class="page-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -36,5 +70,163 @@
 
         {% block content %}{% endblock %}
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const overlay = document.getElementById("tapa-loading-overlay");
+            const title = document.getElementById("tapa-loading-title");
+            const message = document.getElementById("tapa-loading-message");
+            const tip = document.getElementById("tapa-loading-tip");
+            const steps = document.querySelectorAll(".loading-step");
+
+            if (!overlay || !title || !message || !tip) {
+                return;
+            }
+
+            const tips = [
+                "Tip: Cleaner extracted text helps TAPA generate better MCQs.",
+                "Tip: Tables and formulas may take longer to process accurately.",
+                "Tip: TAPA uses your reviewed text, not just the raw uploaded file.",
+                "Tip: You can regenerate questions later if the first set is not ideal.",
+                "Tip: Your quiz history will be saved after you complete a quiz."
+            ];
+
+            let tipIndex = 0;
+            let stepIndex = 0;
+            let tipTimer = null;
+            let stepTimer = null;
+
+            function setLoadingText(type) {
+                const loadingTexts = {
+                    upload: {
+                        title: "Extracting your lecture files...",
+                        message: "TAPA is reading your uploaded notes and preparing the extracted text for review."
+                    },
+                    clean: {
+                        title: "Cleaning extracted text with AI...",
+                        message: "TAPA is fixing spacing, tables, formulas, repeated headers, and messy extracted content."
+                    },
+                    generate: {
+                        title: "Generating your quiz...",
+                        message: "TAPA is creating MCQs, hints, explanations, and difficulty levels from your reviewed notes."
+                    },
+                    regenerate: {
+                        title: "Regenerating your question bank...",
+                        message: "TAPA is replacing the old generated questions with a fresh set."
+                    },
+                    style: {
+                        title: "Building course style profile...",
+                        message: "TAPA is analysing past papers to understand question patterns and expected answer style."
+                    },
+                    default: {
+                        title: "Processing your request...",
+                        message: "Please keep this page open while TAPA completes the task."
+                    }
+                };
+
+                const selected = loadingTexts[type] || loadingTexts.default;
+                title.textContent = selected.title;
+                message.textContent = selected.message;
+            }
+
+            function startLoading(type) {
+                setLoadingText(type);
+
+                overlay.classList.add("show");
+                overlay.setAttribute("aria-hidden", "false");
+                document.body.classList.add("loading-active");
+
+                if (tipTimer) {
+                    clearInterval(tipTimer);
+                }
+
+                if (stepTimer) {
+                    clearInterval(stepTimer);
+                }
+
+                tipTimer = setInterval(function () {
+                    tipIndex = (tipIndex + 1) % tips.length;
+                    tip.textContent = tips[tipIndex];
+                }, 2600);
+
+                stepTimer = setInterval(function () {
+                    steps.forEach(function (step) {
+                        step.classList.remove("active");
+                    });
+
+                    stepIndex = (stepIndex + 1) % steps.length;
+                    steps[stepIndex].classList.add("active");
+                }, 1600);
+            }
+
+            function detectLoadingType(form, submitter) {
+                const action = (form.getAttribute("action") || "").toLowerCase();
+                const buttonText = submitter ? submitter.textContent.toLowerCase() : "";
+
+                if (action.includes("clean-text") || buttonText.includes("clean")) {
+                    return "clean";
+                }
+
+                if (action.includes("generate-style-profile") || buttonText.includes("style profile")) {
+                    return "style";
+                }
+
+                if (action.includes("generate-quiz")) {
+                    if (buttonText.includes("regenerate")) {
+                        return "regenerate";
+                    }
+                    return "generate";
+                }
+
+                if (action.includes("upload") || buttonText.includes("upload")) {
+                    return "upload";
+                }
+
+                if (buttonText.includes("generate")) {
+                    return "generate";
+                }
+
+                return "default";
+            }
+
+            document.querySelectorAll("form[data-loading='true']").forEach(function (form) {
+                form.addEventListener("submit", function (event) {
+                    const submitter = event.submitter || document.activeElement;
+
+                    if (submitter && submitter.dataset.noOverlay === "true") {
+                        return;
+                    }
+
+                    const type = form.dataset.loadingType || detectLoadingType(form, submitter);
+
+                    startLoading(type);
+
+                    if (submitter && submitter.tagName === "BUTTON") {
+                        submitter.disabled = true;
+                        submitter.classList.add("is-loading");
+                    }
+                });
+            });
+
+            window.addEventListener("pageshow", function () {
+                overlay.classList.remove("show");
+                overlay.setAttribute("aria-hidden", "true");
+                document.body.classList.remove("loading-active");
+
+                if (tipTimer) {
+                    clearInterval(tipTimer);
+                }
+
+                if (stepTimer) {
+                    clearInterval(stepTimer);
+                }
+
+                document.querySelectorAll("button.is-loading").forEach(function (button) {
+                    button.disabled = false;
+                    button.classList.remove("is-loading");
+                });
+            });
+        });
+    </script>
 </body>
 </html>

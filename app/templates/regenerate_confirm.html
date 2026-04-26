@@ -57,7 +57,10 @@
                 Cancel
             </a>
 
-            <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}">
+            <form method="POST"
+                action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                data-loading="true"
+                data-loading-type="regenerate">
                 <input type="hidden" name="confirm_regenerate" value="yes">
                 <button type="submit" class="btn btn-primary">
                     Yes, Regenerate Quiz

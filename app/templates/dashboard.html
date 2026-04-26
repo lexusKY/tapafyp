@@ -101,10 +101,15 @@
                                             Review
                                         </a>
 
-                                        <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
-                                           class="btn btn-sm btn-primary">
-                                            Generate Quiz
-                                        </a>
+                                        <form method="POST"
+                                            action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                                            class="inline-action-form"
+                                            data-loading="true"
+                                            data-loading-type="generate">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                Generate Quiz
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}

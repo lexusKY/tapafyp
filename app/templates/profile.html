@@ -79,16 +79,16 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('main.profile') }}">
+                    <form method="POST" action="{{ url_for('main.profile') }}" data-no-loading="true">
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label">Full Name</label>
                                 <input type="text"
-                                       name="full_name"
-                                       class="form-control"
-                                       value="{{ user.full_name or '' }}"
-                                       placeholder="Example: Tan Kai Yang">
+                                    name="full_name"
+                                    class="form-control"
+                                    value="{{ user.full_name or '' }}"
+                                    placeholder="Example: Chua Kek Yang">
                             </div>
 
                             <div class="col-md-6">
@@ -97,7 +97,7 @@
                                        name="student_id"
                                        class="form-control"
                                        value="{{ user.student_id or '' }}"
-                                       placeholder="Example: 2201234">
+                                       placeholder="Example: 2103936">
                             </div>
 
                             <div class="col-md-6">
@@ -115,7 +115,7 @@
                                        name="faculty"
                                        class="form-control"
                                        value="{{ user.faculty or '' }}"
-                                       placeholder="Example: FICT / LKC FES">
+                                       placeholder="Example: LKC FES">
                             </div>
 
                             <div class="col-md-6">

@@ -22,7 +22,7 @@
         TAPA will use this reviewed text instead of the raw extracted text.
     </div>
 
-    <form method="POST" action="{{ url_for('main.review_material', material_id=material.id) }}">
+    <form method="POST" action="{{ url_for('main.review_material', material_id=material.id) }}" data-loading="true">
 
         <div class="row g-4">
 
@@ -127,7 +127,8 @@
                             <button type="submit"
                                     name="action"
                                     value="save"
-                                    class="btn btn-outline-primary">
+                                    class="btn btn-outline-primary"
+                                    data-no-overlay="true">
                                 Save Review
                             </button>
 

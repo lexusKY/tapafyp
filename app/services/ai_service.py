@@ -166,7 +166,13 @@ Rules:
 10. question_type should be "mcq".
 11. Include a short hint for the learner before answering.
 12. Include a short explanation for why the correct answer is correct.
-13. Return valid JSON only.
+13. If the source content contains programming code, do NOT paste a long raw code block directly into the question sentence.
+14. For programming questions, write a short question first, then include only the necessary code snippet using markdown code fences.
+15. Code snippets must be short and focused, preferably under 15 lines.
+16. Use the correct code fence label when obvious, such as ```tsx, ```js, ```python, ```java, ```html, or ```sql.
+17. If a long code example is needed, summarize the context and include only the important function, class, or line.
+18. Do not include huge base64 strings, long URLs, or unnecessary full files in the question text.
+19. Return valid JSON only.
 """
 
         response_schema = {
