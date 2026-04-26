@@ -3,19 +3,62 @@
 {% block title %}Login - TAPA{% endblock %}
 
 {% block content %}
-    <h2>Login</h2>
+<div class="auth-page-modern">
 
-    <form method="POST">
-        <div style="margin-bottom: 10px;">
-            <label for="email">Email</label><br>
-            <input type="email" id="email" name="email" required>
+    <div class="auth-visual">
+        <div class="auth-brand-badge">TAPA</div>
+
+        <h1>Welcome back.</h1>
+
+        <p>
+            Continue your personalised study workflow and review your generated quizzes.
+        </p>
+
+        <div class="auth-mini-list">
+            <span>✓ Upload lecture notes</span>
+            <span>✓ Generate MCQs</span>
+            <span>✓ Track quiz history</span>
+        </div>
+    </div>
+
+    <div class="auth-panel">
+        <div class="auth-panel-header">
+            <div class="auth-logo-mark">T</div>
+            <h2>Login to TAPA</h2>
+            <p>Enter your student account details to continue.</p>
         </div>
 
-        <div style="margin-bottom: 10px;">
-            <label for="password">Password</label><br>
-            <input type="password" id="password" name="password" required>
-        </div>
+        <form method="POST" class="auth-form" data-no-loading="true">
+            <div class="mb-3">
+                <label class="form-label" for="email">Email</label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       class="form-control"
+                       placeholder="Example: student@email.com"
+                       required>
+            </div>
 
-        <button type="submit">Login</button>
-    </form>
+            <div class="mb-3">
+                <label class="form-label" for="password">Password</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Enter your password"
+                       required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Login
+            </button>
+        </form>
+
+        <p class="auth-switch-text">
+            New to TAPA?
+            <a href="{{ url_for('auth.register') }}">Create an account</a>
+        </p>
+    </div>
+
+</div>
 {% endblock %}

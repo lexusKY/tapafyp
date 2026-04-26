@@ -1,8 +1,111 @@
 {% extends "base.html" %}
 
-{% block title %}Home - TAPA{% endblock %}
+{% block title %}TAPA - AI Study Quiz Generator{% endblock %}
 
 {% block content %}
-    <h1>Welcome to TAPA</h1>
-    <p>Your AI-powered PDF quiz system.</p>
+<div class="landing-page">
+
+    <section class="landing-hero-modern">
+        <div class="landing-copy">
+            <div class="eyebrow">AI-Powered Personalised Assessment</div>
+
+            <h1>Turn your lecture notes into interactive quizzes.</h1>
+
+            <p>
+                TAPA helps students upload study materials, clean extracted content, generate MCQs,
+                practise by difficulty level, and review quiz history in one place.
+            </p>
+
+            <div class="landing-actions">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg">
+                        Go to Dashboard
+                    </a>
+
+                    <a href="{{ url_for('main.upload') }}" class="btn btn-outline-primary btn-lg">
+                        Upload Material
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                        Get Started
+                    </a>
+
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">
+                        Login
+                    </a>
+                {% endif %}
+            </div>
+
+            <div class="landing-trust-row">
+                <span>PDF / DOCX / PPTX / HTML</span>
+                <span>AI text cleaning</span>
+                <span>Quiz history</span>
+            </div>
+        </div>
+
+        <div class="landing-preview-card">
+            <div class="preview-top">
+                <div>
+                    <span class="preview-dot"></span>
+                    <span class="preview-dot"></span>
+                    <span class="preview-dot"></span>
+                </div>
+                <strong>TAPA Workflow</strong>
+            </div>
+
+            <div class="preview-step active">
+                <div class="preview-icon">1</div>
+                <div>
+                    <strong>Upload notes</strong>
+                    <span>Import your lecture files into one material workspace.</span>
+                </div>
+            </div>
+
+            <div class="preview-step">
+                <div class="preview-icon">2</div>
+                <div>
+                    <strong>Review & clean</strong>
+                    <span>Fix extracted text manually or use AI Clean Text.</span>
+                </div>
+            </div>
+
+            <div class="preview-step">
+                <div class="preview-icon">3</div>
+                <div>
+                    <strong>Generate quiz</strong>
+                    <span>Create MCQs with hints, answers, and explanations.</span>
+                </div>
+            </div>
+
+            <div class="preview-step">
+                <div class="preview-icon">4</div>
+                <div>
+                    <strong>Practise & review</strong>
+                    <span>Track attempts, retry wrong questions, and export question banks.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="landing-feature-grid">
+        <div class="landing-feature-card">
+            <div class="feature-icon">✨</div>
+            <h3>AI Clean Text</h3>
+            <p>Improve messy extraction, tables, formulas, and repeated slide text before quiz generation.</p>
+        </div>
+
+        <div class="landing-feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Difficulty Levels</h3>
+            <p>Generate and practise Hot, Moderate, and Cold questions for more focused revision.</p>
+        </div>
+
+        <div class="landing-feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Quiz History</h3>
+            <p>Save attempts automatically and review your answers, explanations, and progress anytime.</p>
+        </div>
+    </section>
+
+</div>
 {% endblock %}
