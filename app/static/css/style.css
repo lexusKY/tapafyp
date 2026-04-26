@@ -3592,3 +3592,816 @@ button.is-loading {
         border-radius: 24px;
     }
 }
+
+/* ============================================================
+   Simplified Material Workspace Actions
+   ============================================================ */
+
+.workflow-guide {
+    display: grid;
+    gap: 12px;
+}
+
+.workflow-step-card {
+    width: 100%;
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 15px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: inherit;
+    text-align: left;
+    transition: 0.18s var(--ease);
+}
+
+.workflow-step-card:hover {
+    transform: translateY(-1px);
+    background: var(--v-50);
+    border-color: var(--border-md);
+    color: inherit;
+}
+
+.workflow-button-card {
+    cursor: pointer;
+    font: inherit;
+}
+
+.workflow-step-number {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--v-100);
+    color: var(--v-700);
+    font-weight: 900;
+}
+
+.workflow-step-card strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--ink-900);
+}
+
+.workflow-step-card span {
+    display: block;
+    color: var(--ink-500);
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.workflow-primary-step {
+    background: var(--grad-primary);
+    border-color: transparent;
+    box-shadow: 0 8px 22px rgba(108, 92, 231, 0.22);
+}
+
+.workflow-primary-step strong,
+.workflow-primary-step span {
+    color: #ffffff;
+}
+
+.workflow-primary-step .workflow-step-number {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.workflow-disabled-step {
+    opacity: 0.68;
+    cursor: not-allowed;
+}
+
+.workflow-disabled-step:hover {
+    transform: none;
+    background: var(--surface-2);
+    border-color: var(--border);
+}
+
+.workflow-tip {
+    margin-top: 14px;
+    padding: 13px 14px;
+    border-radius: var(--r-lg);
+    background: var(--m-50);
+    color: var(--m-700);
+    border-left: 4px solid var(--m-400);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.workflow-tip span {
+    font-weight: 900;
+}
+
+.workspace-tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.workspace-tool-card {
+    padding: 13px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: inherit;
+    transition: 0.18s var(--ease);
+}
+
+.workspace-tool-card:hover {
+    transform: translateY(-1px);
+    background: var(--v-50);
+    border-color: var(--border-md);
+    color: inherit;
+}
+
+.workspace-tool-card strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ink-900);
+    font-size: 0.88rem;
+}
+
+.workspace-tool-card span {
+    display: block;
+    color: var(--ink-500);
+    font-size: 0.74rem;
+    line-height: 1.35;
+}
+
+.workspace-danger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin: 4px 0 24px;
+}
+
+.workspace-danger-row form {
+    margin: 0;
+}
+
+.workspace-delete-icon-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--r-600);
+    border: 1.5px solid rgba(255, 107, 107, 0.28);
+    box-shadow: var(--shadow-card);
+}
+
+.workspace-delete-icon-btn:hover {
+    background: var(--grad-rose);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 8px 22px rgba(255, 107, 107, 0.28);
+}
+
+.workspace-back-link {
+    color: var(--ink-500);
+    font-weight: 800;
+    font-size: 0.86rem;
+}
+
+.workspace-back-link:hover {
+    color: var(--v-600);
+}
+
+@media (max-width: 560px) {
+    .workspace-tool-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workspace-danger-row {
+        align-items: flex-start;
+        flex-direction: column-reverse;
+    }
+}
+
+/* ============================================================
+   Material Workflow Highlight Fix
+   ============================================================ */
+
+.workflow-guide {
+    display: grid;
+    gap: 12px;
+}
+
+.workflow-step-card {
+    width: 100%;
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 15px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: inherit;
+    text-align: left;
+    transition: 0.18s var(--ease);
+}
+
+.workflow-step-card:hover {
+    transform: translateY(-1px);
+    background: var(--v-50);
+    border-color: var(--border-md);
+    color: inherit;
+}
+
+.workflow-step-number {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--v-100);
+    color: var(--v-700);
+    font-weight: 900;
+}
+
+.workflow-step-card strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--ink-900);
+}
+
+.workflow-step-card span {
+    display: block;
+    color: var(--ink-500);
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.workflow-button-card {
+    cursor: pointer;
+    font: inherit;
+}
+
+.workflow-generate-step {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #6c5ce7 0%, #8b82f0 58%, #00c9a7 130%);
+    border-color: transparent;
+    box-shadow: 0 12px 28px rgba(108, 92, 231, 0.28);
+}
+
+.workflow-generate-step::after {
+    content: "AI";
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    padding: 4px 8px;
+    border-radius: var(--r-pill);
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.workflow-generate-step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(108, 92, 231, 0.34);
+}
+
+.workflow-generate-step strong,
+.workflow-generate-step span {
+    color: #ffffff !important;
+}
+
+.workflow-generate-step .workflow-step-number {
+    background: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+}
+
+.workflow-start-step {
+    background: linear-gradient(135deg, #5346cc 0%, #6c5ce7 60%, #8b82f0 100%);
+    border-color: transparent;
+    box-shadow: 0 10px 24px rgba(108, 92, 231, 0.26);
+}
+
+.workflow-start-step:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(108, 92, 231, 0.34);
+}
+
+.workflow-start-step strong,
+.workflow-start-step span {
+    color: #ffffff !important;
+}
+
+.workflow-start-step .workflow-step-number {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+}
+
+.workflow-disabled-step {
+    opacity: 0.68;
+    cursor: not-allowed;
+}
+
+.workflow-disabled-step:hover {
+    transform: none;
+    background: var(--surface-2);
+    border-color: var(--border);
+}
+
+.workflow-tip {
+    margin-top: 14px;
+    padding: 13px 14px;
+    border-radius: var(--r-lg);
+    background: var(--m-50);
+    color: var(--m-700);
+    border-left: 4px solid var(--m-400);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.workflow-tip span {
+    font-weight: 900;
+}
+
+.workspace-tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.workspace-tool-card {
+    padding: 13px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: inherit;
+    transition: 0.18s var(--ease);
+}
+
+.workspace-tool-card:hover {
+    transform: translateY(-1px);
+    background: var(--v-50);
+    border-color: var(--border-md);
+    color: inherit;
+}
+
+.workspace-tool-card strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ink-900);
+    font-size: 0.88rem;
+}
+
+.workspace-tool-card span {
+    display: block;
+    color: var(--ink-500);
+    font-size: 0.74rem;
+    line-height: 1.35;
+}
+
+.workspace-danger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin: 4px 0 24px;
+}
+
+.workspace-danger-row form {
+    margin: 0;
+}
+
+.workspace-delete-icon-btn {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--r-600);
+    border: 1.5px solid rgba(255, 107, 107, 0.28);
+    box-shadow: var(--shadow-card);
+}
+
+.workspace-delete-icon-btn:hover {
+    background: var(--grad-rose);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 8px 22px rgba(255, 107, 107, 0.28);
+}
+
+.workspace-back-link {
+    color: var(--ink-500);
+    font-weight: 800;
+    font-size: 0.86rem;
+}
+
+.workspace-back-link:hover {
+    color: var(--v-600);
+}
+
+@media (max-width: 560px) {
+    .workspace-tool-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workspace-danger-row {
+        align-items: flex-start;
+        flex-direction: column-reverse;
+    }
+}
+
+/* Fix workflow button hover blank/washed-out issue */
+.workflow-button-card {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+    color: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.workflow-button-card:hover {
+    background: var(--v-50);
+    border-color: var(--border-md);
+    color: inherit;
+}
+
+.workflow-button-card:hover strong {
+    color: var(--ink-900);
+}
+
+.workflow-button-card:hover span {
+    color: var(--ink-500);
+}
+
+.workflow-button-card:hover .workflow-step-number {
+    background: var(--v-100);
+    color: var(--v-700);
+}
+
+.workflow-guide form {
+    margin: 0;
+}
+
+.workflow-guide button.workflow-step-card,
+.workflow-guide button.workflow-step-card:hover,
+.workflow-guide button.workflow-step-card:focus {
+    background: var(--surface-2) !important;
+    border: 1.5px solid var(--border-md) !important;
+    color: var(--ink-900) !important;
+    opacity: 1 !important;
+}
+
+.workflow-guide button.workflow-step-card strong,
+.workflow-guide button.workflow-step-card:hover strong,
+.workflow-guide button.workflow-step-card:focus strong {
+    color: var(--ink-900) !important;
+    opacity: 1 !important;
+}
+
+.workflow-guide button.workflow-step-card span,
+.workflow-guide button.workflow-step-card:hover span,
+.workflow-guide button.workflow-step-card:focus span {
+    color: var(--ink-500) !important;
+    opacity: 1 !important;
+}
+
+.workflow-guide button.workflow-step-card .workflow-step-number {
+    background: var(--v-100) !important;
+    color: var(--v-700) !important;
+}
+
+.workflow-step-form {
+    margin: 0;
+}
+
+.workflow-step-static {
+    cursor: default;
+}
+
+.workflow-step-static:hover {
+    transform: none;
+    background: var(--surface-2);
+    border-color: var(--border);
+}
+
+.workflow-step-content {
+    flex: 1;
+}
+
+.workflow-inner-btn {
+    margin-top: 10px;
+}
+
+/* Fix Start Quiz workflow hover readability */
+.workflow-primary-step:hover {
+    background: var(--v-50) !important;
+    border-color: var(--border-md) !important;
+    box-shadow: var(--shadow-card) !important;
+    color: var(--v-700) !important;
+}
+
+.workflow-primary-step:hover strong {
+    color: var(--v-700) !important;
+}
+
+.workflow-primary-step:hover span {
+    color: var(--ink-600) !important;
+}
+
+.workflow-primary-step:hover .workflow-step-number {
+    background: var(--v-100) !important;
+    color: var(--v-700) !important;
+}
+
+/* ============================================================
+    Workflow Start Quiz Hover Fix
+   ============================================================ */
+
+.workflow-guide a.workflow-primary-step,
+.workflow-guide a.workflow-primary-step:link,
+.workflow-guide a.workflow-primary-step:visited {
+    background: var(--grad-primary) !important;
+    border-color: transparent !important;
+    color: #ffffff !important;
+}
+
+.workflow-guide a.workflow-primary-step strong,
+.workflow-guide a.workflow-primary-step span {
+    color: #ffffff !important;
+}
+
+.workflow-guide a.workflow-primary-step .workflow-step-number {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.workflow-guide a.workflow-primary-step:hover,
+.workflow-guide a.workflow-primary-step:focus {
+    background: var(--v-50) !important;
+    border-color: var(--border-lg) !important;
+    color: var(--v-700) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+.workflow-guide a.workflow-primary-step:hover strong,
+.workflow-guide a.workflow-primary-step:focus strong {
+    color: var(--v-700) !important;
+}
+
+.workflow-guide a.workflow-primary-step:hover span,
+.workflow-guide a.workflow-primary-step:focus span {
+    color: var(--ink-600) !important;
+}
+
+.workflow-guide a.workflow-primary-step:hover .workflow-step-number,
+.workflow-guide a.workflow-primary-step:focus .workflow-step-number {
+    background: var(--v-100) !important;
+    color: var(--v-700) !important;
+}
+
+/* ============================================================
+   TAPA Workflow Cards - Isolated Clean Version
+   ============================================================ */
+
+.tapa-workflow-list {
+    display: grid;
+    gap: 12px;
+}
+
+.tapa-workflow-form {
+    margin: 0;
+}
+
+.tapa-workflow-card,
+button.tapa-workflow-card,
+a.tapa-workflow-card,
+div.tapa-workflow-card {
+    width: 100%;
+    min-height: 112px;
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border-md);
+    background: #ffffff;
+    color: var(--ink-900) !important;
+    text-align: left;
+    box-shadow: var(--shadow-card);
+    transition: transform 180ms var(--ease), background 180ms var(--ease), border-color 180ms var(--ease), box-shadow 180ms var(--ease);
+}
+
+button.tapa-workflow-card {
+    font-family: var(--font);
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.tapa-workflow-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-lg);
+    background: var(--v-50);
+    color: var(--ink-900) !important;
+    box-shadow: var(--shadow-hover);
+}
+
+.tapa-workflow-num {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: var(--v-100);
+    color: var(--v-700);
+    font-size: 1rem;
+    font-weight: 900;
+}
+
+.tapa-workflow-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.tapa-workflow-text strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--ink-900) !important;
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.tapa-workflow-text span {
+    display: block;
+    color: var(--ink-500) !important;
+    font-size: 0.84rem;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+/* Step 2 generate card */
+.tapa-workflow-generate {
+    background: #ffffff !important;
+}
+
+.tapa-workflow-generate:hover {
+    background: var(--v-50) !important;
+}
+
+.tapa-workflow-generate:hover .tapa-workflow-text strong {
+    color: var(--v-700) !important;
+}
+
+/* Step 3 start card */
+.tapa-workflow-start {
+    background: var(--grad-primary) !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 24px rgba(108, 92, 231, 0.28);
+}
+
+.tapa-workflow-start .tapa-workflow-num {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.tapa-workflow-start .tapa-workflow-text strong,
+.tapa-workflow-start .tapa-workflow-text span {
+    color: #ffffff !important;
+}
+
+.tapa-workflow-start:hover {
+    background: var(--v-50) !important;
+    border-color: var(--border-lg) !important;
+    box-shadow: var(--shadow-hover);
+}
+
+.tapa-workflow-start:hover .tapa-workflow-num {
+    background: var(--v-100) !important;
+    color: var(--v-700) !important;
+}
+
+.tapa-workflow-start:hover .tapa-workflow-text strong {
+    color: var(--v-700) !important;
+}
+
+.tapa-workflow-start:hover .tapa-workflow-text span {
+    color: var(--ink-600) !important;
+}
+
+/* Locked step */
+.tapa-workflow-locked {
+    opacity: 0.72;
+    cursor: not-allowed;
+    background: var(--surface-2) !important;
+}
+
+.tapa-workflow-locked:hover {
+    transform: none;
+    box-shadow: var(--shadow-card);
+}
+
+/* Question tools */
+.workspace-tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.workspace-tool-card {
+    padding: 13px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: inherit;
+    transition: 0.18s var(--ease);
+}
+
+.workspace-tool-card:hover {
+    transform: translateY(-1px);
+    background: var(--v-50);
+    border-color: var(--border-md);
+    color: inherit;
+}
+
+.workspace-tool-card strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ink-900);
+    font-size: 0.88rem;
+}
+
+.workspace-tool-card span {
+    display: block;
+    color: var(--ink-500);
+    font-size: 0.74rem;
+    line-height: 1.35;
+}
+
+/* Bottom danger row */
+.workspace-danger-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin: 4px 0 24px;
+}
+
+.workspace-danger-row form {
+    margin: 0;
+}
+
+.workspace-delete-icon-btn {
+    width: 42px;
+    height: 42px;
+    min-height: 42px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--r-600);
+    border: 1.5px solid rgba(255, 107, 107, 0.28);
+    box-shadow: var(--shadow-card);
+}
+
+.workspace-delete-icon-btn:hover {
+    background: var(--grad-rose);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 8px 22px rgba(255, 107, 107, 0.28);
+}
+
+.workspace-back-link {
+    color: var(--ink-500);
+    font-weight: 800;
+    font-size: 0.86rem;
+}
+
+.workspace-back-link:hover {
+    color: var(--v-600);
+}
+
+@media (max-width: 560px) {
+    .workspace-tool-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workspace-danger-row {
+        align-items: flex-start;
+        flex-direction: column-reverse;
+    }
+}

@@ -32,10 +32,10 @@
                 </a>
             {% else %}
                 <form method="POST"
-                    action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
-                    class="inline-action-form"
-                    data-loading="true"
-                    data-loading-type="generate">
+                      action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                      class="inline-action-form"
+                      data-loading="true"
+                      data-loading-type="generate">
                     <button type="submit" class="btn btn-primary">
                         Generate Quiz
                     </button>
@@ -74,7 +74,9 @@
                 <div class="card-header bg-white workspace-card-header">
                     <div>
                         <h5 class="mb-0 fw-semibold">Reviewed Extracted Text</h5>
-                        <p class="text-muted mb-0">This is the text TAPA uses to generate your quiz.</p>
+                        <p class="text-muted mb-0">
+                            This reviewed text is used by TAPA to generate your quiz.
+                        </p>
                     </div>
 
                     <a href="{{ url_for('main.review_material', material_id=material.id) }}"
@@ -100,6 +102,78 @@
         </div>
 
         <div class="workspace-side">
+
+            <div class="card workspace-section-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-semibold">Recommended Workflow</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="tapa-workflow-list">
+
+                        <a href="{{ url_for('main.review_material', material_id=material.id) }}"
+                           class="tapa-workflow-card tapa-workflow-review">
+                            <div class="tapa-workflow-num">1</div>
+                            <div class="tapa-workflow-text">
+                                <strong>Review / Clean Text</strong>
+                                <span>Check extraction quality before generating questions.</span>
+                            </div>
+                        </a>
+
+                        <form method="POST"
+                              action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                              data-loading="true"
+                              data-loading-type="generate"
+                              class="tapa-workflow-form">
+                            <button type="submit"
+                                    class="tapa-workflow-card tapa-workflow-generate">
+                                <div class="tapa-workflow-num">2</div>
+                                <div class="tapa-workflow-text">
+                                    <strong>
+                                        {% if question_count > 0 %}
+                                            Regenerate Quiz
+                                        {% else %}
+                                            Generate Quiz
+                                        {% endif %}
+                                    </strong>
+                                    <span>
+                                        {% if question_count > 0 %}
+                                            Replace the current question bank with a new set.
+                                        {% else %}
+                                            Create MCQs from your reviewed text.
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </button>
+                        </form>
+
+                        {% if question_count > 0 %}
+                            <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
+                               class="tapa-workflow-card tapa-workflow-start">
+                                <div class="tapa-workflow-num">3</div>
+                                <div class="tapa-workflow-text">
+                                    <strong>Start Quiz</strong>
+                                    <span>Practise by choosing Hot, Moderate, Cold, or All.</span>
+                                </div>
+                            </a>
+                        {% else %}
+                            <div class="tapa-workflow-card tapa-workflow-locked">
+                                <div class="tapa-workflow-num">3</div>
+                                <div class="tapa-workflow-text">
+                                    <strong>Start Quiz</strong>
+                                    <span>Generate questions first to unlock quiz practice.</span>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    <div class="workflow-tip">
+                        <strong>Recommended:</strong>
+                        Use AI Clean Text before generating quiz questions for better question quality.
+                    </div>
+                </div>
+            </div>
 
             <div class="card workspace-section-card">
                 <div class="card-header bg-white">
@@ -136,64 +210,53 @@
                 </div>
             </div>
 
-            <div class="card workspace-section-card">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0 fw-semibold">Actions</h5>
-                </div>
+            {% if question_count > 0 %}
+                <div class="card workspace-section-card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0 fw-semibold">Question Tools</h5>
+                    </div>
 
-                <div class="card-body">
-                    <div class="workspace-action-list">
-                        <a href="{{ url_for('main.review_material', material_id=material.id) }}"
-                        class="btn btn-outline-primary">
-                            Edit Review / Preferences
-                        </a>
-
-                        <form method="POST"
-                            action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
-                            data-loading="true"
-                            data-loading-type="generate">
-                            <button type="submit" class="btn btn-primary w-100">
-                                Generate / Regenerate Quiz
-                            </button>
-                        </form>
-
-                        {% if question_count > 0 %}
-                            <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
-                            class="btn btn-outline-primary">
-                                Start Existing Quiz
-                            </a>
-
+                    <div class="card-body">
+                        <div class="workspace-tool-grid">
                             <a href="{{ url_for('main.question_bank', material_id=material.id) }}"
-                            class="btn btn-outline-primary">
-                                View Generated Questions
-                            </a>
-
-                            <a href="{{ url_for('main.material_attempts', material_id=material.id) }}"
-                            class="btn btn-outline-primary">
-                                View Material Attempts
+                               class="workspace-tool-card">
+                                <strong>View Questions</strong>
+                                <span>Preview generated MCQs</span>
                             </a>
 
                             <a href="{{ url_for('main.export_question_bank', material_id=material.id) }}"
-                            class="btn btn-outline-primary">
-                                Export Question Bank
+                               class="workspace-tool-card">
+                                <strong>Export TXT</strong>
+                                <span>Download question bank</span>
                             </a>
-                        {% endif %}
 
-                        <form method="POST"
-                            action="{{ url_for('main.delete_material', material_id=material.id) }}"
-                            onsubmit="return confirm('Are you sure you want to delete this material? This will also delete its generated questions and quiz history.');">
-                            <button type="submit" class="btn btn-danger-outline w-100">
-                                Delete Material
-                            </button>
-                        </form>
+                            <a href="{{ url_for('main.material_attempts', material_id=material.id) }}"
+                               class="workspace-tool-card">
+                                <strong>View Attempts</strong>
+                                <span>See quiz history</span>
+                            </a>
 
-                        <a href="{{ url_for('main.dashboard') }}"
-                        class="btn btn-outline-secondary">
-                            Back to Dashboard
-                        </a>
+                            <a href="{{ url_for('main.dashboard') }}"
+                               class="workspace-tool-card">
+                                <strong>Dashboard</strong>
+                                <span>Back to materials</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="card workspace-section-card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0 fw-semibold">Question Tools</h5>
+                    </div>
+
+                    <div class="card-body">
+                        <p class="text-muted mb-0">
+                            Question tools will appear after you generate your first quiz.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
             <div class="card workspace-section-card">
                 <div class="card-header bg-white workspace-card-header">
@@ -202,7 +265,7 @@
                     </div>
 
                     <a href="{{ url_for('main.material_attempts', material_id=material.id) }}"
-                        class="btn btn-sm btn-outline-primary">
+                       class="btn btn-sm btn-outline-primary">
                         View All
                     </a>
                 </div>
@@ -211,7 +274,6 @@
                     {% if recent_attempts %}
                         <div class="workspace-attempt-list">
                             {% for attempt in recent_attempts %}
-                                {% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
                                 <a href="{{ url_for('main.attempt_detail', attempt_id=attempt.id) }}"
                                    class="workspace-attempt-item">
                                     <div>
@@ -231,6 +293,23 @@
                         </p>
                     {% endif %}
                 </div>
+            </div>
+
+            <div class="workspace-danger-row">
+                <form method="POST"
+                      action="{{ url_for('main.delete_material', material_id=material.id) }}"
+                      onsubmit="return confirm('Are you sure you want to delete this material? This will also delete its generated questions and quiz history.');">
+                    <button type="submit"
+                            class="workspace-delete-icon-btn"
+                            title="Delete Material"
+                            aria-label="Delete Material">
+                        🗑
+                    </button>
+                </form>
+
+                <a href="{{ url_for('main.dashboard') }}" class="workspace-back-link">
+                    Back to Dashboard
+                </a>
             </div>
 
         </div>
