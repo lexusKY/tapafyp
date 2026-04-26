@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, current_app, request, redirect, ur
 from flask_login import login_required, current_user
 
 from app import db
-from app.models import Material, Question, Choice
+from app.models import Material, Question, Choice, QuizAttempt, QuizAnswer
 from app.services.ai_service import generate_mcqs_from_text
 from app.services.course_profile_service import build_style_profile_for_course
 from app.services.lecture_file_service import extract_text_from_file, combine_extracted_text
@@ -74,6 +74,33 @@ def safe_question_count(value):
         return 20
 
     return count
+
+
+def save_quiz_attempt(material, level, score, total_questions, results, attempt_type="normal"):
+    attempt = QuizAttempt(
+        user_id=current_user.id,
+        material_id=material.id,
+        level=level,
+        score=score,
+        total_questions=total_questions,
+        attempt_type=attempt_type
+    )
+
+    db.session.add(attempt)
+    db.session.flush()
+
+    for item in results:
+        answer = QuizAnswer(
+            attempt_id=attempt.id,
+            question_id=item["question"].id,
+            selected_choice_id=item["selected_choice"].id if item["selected_choice"] else None,
+            correct_choice_id=item["correct_choice"].id if item["correct_choice"] else None,
+            is_correct=item["is_correct"]
+        )
+        db.session.add(answer)
+
+    db.session.commit()
+    return attempt
 
 
 @main.route("/")
@@ -513,6 +540,15 @@ def quiz_result(material_id, level):
 
     session[f"retry_{material_id}_{level}_question_ids"] = wrong_question_ids
 
+    attempt = save_quiz_attempt(
+        material=material,
+        level=level,
+        score=score,
+        total_questions=total_questions,
+        results=results,
+        attempt_type="normal"
+    )
+
     return render_template(
         "quiz_result.html",
         material=material,
@@ -520,7 +556,8 @@ def quiz_result(material_id, level):
         total_questions=total_questions,
         results=results,
         level=level,
-        retry_available=retry_available
+        retry_available=retry_available,
+        attempt=attempt
     )
 
 
@@ -687,6 +724,15 @@ def retry_result(material_id, level):
 
     total_questions = len(questions)
 
+    attempt = save_quiz_attempt(
+        material=material,
+        level=level,
+        score=score,
+        total_questions=total_questions,
+        results=results,
+        attempt_type="retry"
+    )
+
     return render_template(
         "quiz_result.html",
         material=material,
@@ -694,7 +740,45 @@ def retry_result(material_id, level):
         total_questions=total_questions,
         results=results,
         level=f"{level} Retry",
-        retry_available=False
+        retry_available=False,
+        attempt=attempt
+    )
+
+
+@main.route("/history")
+@login_required
+def history():
+    attempts = (
+        QuizAttempt.query
+        .filter_by(user_id=current_user.id)
+        .order_by(QuizAttempt.created_at.desc())
+        .all()
+    )
+
+    return render_template("history.html", attempts=attempts)
+
+
+@main.route("/attempt/<int:attempt_id>")
+@login_required
+def attempt_detail(attempt_id):
+    attempt = (
+        QuizAttempt.query
+        .filter_by(id=attempt_id, user_id=current_user.id)
+        .first_or_404()
+    )
+
+    answers = (
+        QuizAnswer.query
+        .filter_by(attempt_id=attempt.id)
+        .join(Question)
+        .order_by(Question.id.asc())
+        .all()
+    )
+
+    return render_template(
+        "attempt_detail.html",
+        attempt=attempt,
+        answers=answers
     )
 
 
@@ -729,14 +813,30 @@ def profile():
         .count()
     )
 
+    total_attempts = (
+        QuizAttempt.query
+        .filter_by(user_id=current_user.id)
+        .count()
+    )
+
     recent_materials = materials[:5]
+
+    recent_attempts = (
+        QuizAttempt.query
+        .filter_by(user_id=current_user.id)
+        .order_by(QuizAttempt.created_at.desc())
+        .limit(5)
+        .all()
+    )
 
     return render_template(
         "profile.html",
         user=current_user,
         total_materials=total_materials,
         total_questions=total_questions,
-        recent_materials=recent_materials
+        total_attempts=total_attempts,
+        recent_materials=recent_materials,
+        recent_attempts=recent_attempts
     )
 
 

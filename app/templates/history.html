@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz History - TAPA{% endblock %}
+
+{% block content %}
+<div class="history-page">
+
+    <div class="page-header">
+        <h2>Quiz History</h2>
+        <p>View your previous quiz attempts and reopen saved results anytime.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0 fw-semibold">Previous Attempts</h5>
+        </div>
+
+        <div class="card-body">
+            {% if attempts %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>Course</th>
+                                <th>Level</th>
+                                <th>Score</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for attempt in attempts %}
+                                {% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ attempt.material.title }}</strong>
+                                    </td>
+
+                                    <td>
+                                        {{ attempt.material.course_code or '-' }}
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ attempt.level }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <strong>{{ attempt.score }}/{{ attempt.total_questions }}</strong>
+                                        <span class="text-muted">({{ percentage }}%)</span>
+                                    </td>
+
+                                    <td>
+                                        {% if attempt.attempt_type == "retry" %}
+                                            <span class="status-pill status-wrong">Retry</span>
+                                        {% else %}
+                                            <span class="status-pill status-correct">Normal</span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {{ attempt.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                                    </td>
+
+                                    <td class="text-end">
+                                        <a href="{{ url_for('main.attempt_detail', attempt_id=attempt.id) }}"
+                                           class="btn btn-sm btn-primary">
+                                            View Result
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>No quiz history yet</h3>
+                    <p>Complete a quiz first and your attempt will appear here.</p>
+                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
+                        Go to Dashboard
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

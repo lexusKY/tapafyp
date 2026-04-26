@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Quiz Result - TAPA{% endblock %}
+{% block title %}Attempt Result - TAPA{% endblock %}
 
 {% block content %}
-{% set percentage = (score / total_questions * 100) | round(0) if total_questions > 0 else 0 %}
+{% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
 
 <div class="quiz-result-page">
 
     <div class="result-hero-card">
-        <div class="result-badge">Quiz Complete</div>
+        <div class="result-badge">Saved Attempt</div>
 
-        <h2>{{ score }}/{{ total_questions }}</h2>
+        <h2>{{ attempt.score }}/{{ attempt.total_questions }}</h2>
 
         <p>
-            <strong>{{ material.title }}</strong> · {{ level }} Level
+            <strong>{{ attempt.material.title }}</strong> · {{ attempt.level }} Level
         </p>
 
         <div class="result-progress">
@@ -25,58 +25,54 @@
         </div>
 
         <div class="result-actions">
-            {% if retry_available %}
-                <a class="btn btn-primary" href="{{ url_for('main.retry_wrong', material_id=material.id, level=level) }}">
-                    Retry Wrong Questions
-                </a>
-            {% endif %}
+            <a class="btn btn-primary" href="{{ url_for('main.choose_level', material_id=attempt.material.id) }}">
+                Practise Again
+            </a>
 
-            {% if attempt %}
-                <a class="btn btn-outline-primary" href="{{ url_for('main.attempt_detail', attempt_id=attempt.id) }}">
-                    View Saved Result
-                </a>
-            {% endif %}
-
-            <a class="btn btn-outline-primary" href="{{ url_for('main.choose_level', material_id=material.id) }}">
-                Choose Another Level
+            <a class="btn btn-outline-primary" href="{{ url_for('main.history') }}">
+                Back to History
             </a>
 
             <a class="btn btn-outline-secondary" href="{{ url_for('main.dashboard') }}">
-                Back to Dashboard
+                Dashboard
             </a>
         </div>
+    </div>
 
     <div class="result-section-header">
         <div>
-            <h3>Answer Review</h3>
-            <p>Review your answers and explanations below.</p>
+            <h3>Saved Answer Review</h3>
+            <p>
+                Attempt type: {{ attempt.attempt_type|capitalize }} ·
+                {{ attempt.created_at.strftime('%d %b %Y, %I:%M %p') }}
+            </p>
         </div>
     </div>
 
     <div class="result-list">
-        {% for item in results %}
-            <div class="result-review-card {% if item.is_correct %}is-correct{% else %}is-wrong{% endif %}">
+        {% for answer in answers %}
+            <div class="result-review-card {% if answer.is_correct %}is-correct{% else %}is-wrong{% endif %}">
 
                 <div class="result-review-top">
                     <div class="question-number-pill">
                         Q{{ loop.index }}
                     </div>
 
-                    {% if item.is_correct %}
+                    {% if answer.is_correct %}
                         <span class="status-pill status-correct">Correct</span>
                     {% else %}
                         <span class="status-pill status-wrong">Wrong</span>
                     {% endif %}
                 </div>
 
-                <h3>{{ item.question.question_text }}</h3>
+                <h3>{{ answer.question.question_text }}</h3>
 
                 <div class="answer-grid">
                     <div class="answer-box your-answer">
                         <div class="answer-label">Your Answer</div>
                         <strong>
-                            {% if item.selected_choice %}
-                                {{ item.selected_choice.choice_text }}
+                            {% if answer.selected_choice %}
+                                {{ answer.selected_choice.choice_text }}
                             {% else %}
                                 No answer selected
                             {% endif %}
@@ -86,15 +82,15 @@
                     <div class="answer-box correct-answer">
                         <div class="answer-label">Correct Answer</div>
                         <strong>
-                            {{ item.correct_choice.choice_text if item.correct_choice else 'N/A' }}
+                            {{ answer.correct_choice.choice_text if answer.correct_choice else 'N/A' }}
                         </strong>
                     </div>
                 </div>
 
-                {% if item.question.explanation %}
+                {% if answer.question.explanation %}
                     <div class="explanation-box">
                         <strong>Explanation</strong>
-                        <p>{{ item.question.explanation }}</p>
+                        <p>{{ answer.question.explanation }}</p>
                     </div>
                 {% endif %}
 

@@ -3,26 +3,98 @@
 {% block title %}Upload Lecture Files - TAPA{% endblock %}
 
 {% block content %}
-    <h2>Upload Lecture Files</h2>
-    <p>Upload up to 3 files for one revision set.</p>
-    <p>Supported formats: PDF, DOCX, PPTX, HTML</p>
+<div class="upload-page">
 
-    <form method="POST" enctype="multipart/form-data">
-        <div style="margin-bottom: 10px;">
-            <label for="course_code">Course Code</label><br>
-            <input type="text" id="course_code" name="course_code" placeholder="Example: UECS3253" required>
+    <div class="page-header">
+        <h2>Upload Lecture Files</h2>
+        <p>
+            Upload up to 3 lecture files for one revision set. TAPA will extract the content and let you review it before generating quiz questions.
+        </p>
+    </div>
+
+    <div class="upload-card">
+        <div class="upload-card-header">
+            <div class="upload-icon-small">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3.25a.75.75 0 0 1 .53.22l4.25 4.25a.75.75 0 1 1-1.06 1.06L12.75 5.81V15a.75.75 0 0 1-1.5 0V5.81L8.28 8.78a.75.75 0 1 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 .53-.22ZM5.75 14a.75.75 0 0 1 .75.75v3.5c0 .69.56 1.25 1.25 1.25h8.5c.69 0 1.25-.56 1.25-1.25v-3.5a.75.75 0 0 1 1.5 0v3.5A2.75 2.75 0 0 1 16.25 21h-8.5A2.75 2.75 0 0 1 5 18.25v-3.5a.75.75 0 0 1 .75-.75Z"/>
+                </svg>
+            </div>
+            <div>
+                <h3>Upload Study Materials</h3>
+                <p>Supported formats: PDF, DOCX, PPTX, HTML</p>
+            </div>
         </div>
 
-        <div style="margin-bottom: 10px;">
-            <label for="title">Revision Set Title</label><br>
-            <input type="text" id="title" name="title" placeholder="Example: UECS3253 Topic 1 Notes" required>
-        </div>
+        <form method="POST" enctype="multipart/form-data" class="upload-form">
 
-        <div style="margin-bottom: 10px;">
-            <label for="note_files">Choose 1 to 3 files</label><br>
-            <input type="file" id="note_files" name="note_files" multiple required>
-        </div>
+            <div class="form-grid">
+                <div>
+                    <label class="form-label" for="course_code">Course Code</label>
+                    <input class="form-control"
+                           type="text"
+                           id="course_code"
+                           name="course_code"
+                           placeholder="Example: UECS3253"
+                           required>
+                </div>
 
-        <button type="submit">Upload Files</button>
-    </form>
+                <div>
+                    <label class="form-label" for="title">Revision Set Title</label>
+                    <input class="form-control"
+                           type="text"
+                           id="title"
+                           name="title"
+                           placeholder="Example: UECS3253 Topic 1 Notes"
+                           required>
+                </div>
+            </div>
+
+            <label class="upload-dropzone" for="note_files">
+                <input type="file"
+                       id="note_files"
+                       name="note_files"
+                       multiple
+                       required
+                       accept=".pdf,.docx,.pptx,.html">
+
+                <div class="upload-icon-large">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3.25a.75.75 0 0 1 .53.22l4.25 4.25a.75.75 0 1 1-1.06 1.06L12.75 5.81V15a.75.75 0 0 1-1.5 0V5.81L8.28 8.78a.75.75 0 1 1-1.06-1.06l4.25-4.25a.75.75 0 0 1 .53-.22ZM5.75 14a.75.75 0 0 1 .75.75v3.5c0 .69.56 1.25 1.25 1.25h8.5c.69 0 1.25-.56 1.25-1.25v-3.5a.75.75 0 0 1 1.5 0v3.5A2.75 2.75 0 0 1 16.25 21h-8.5A2.75 2.75 0 0 1 5 18.25v-3.5a.75.75 0 0 1 .75-.75Z"/>
+                    </svg>
+                </div>
+
+                <h4>Click to upload files</h4>
+                <p>Choose 1 to 3 files or drag them here</p>
+                <span class="upload-pill">Choose Files</span>
+                <small id="file-name-preview">No file chosen</small>
+            </label>
+
+            <div class="upload-actions">
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Upload Files
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById("note_files");
+    const filePreview = document.getElementById("file-name-preview");
+
+    fileInput.addEventListener("change", function () {
+        if (!fileInput.files.length) {
+            filePreview.textContent = "No file chosen";
+            return;
+        }
+
+        const names = Array.from(fileInput.files).map(file => file.name);
+        filePreview.textContent = names.join(", ");
+    });
+</script>
 {% endblock %}

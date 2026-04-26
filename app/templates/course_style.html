@@ -3,19 +3,37 @@
 {% block title %}Course Style Profile - TAPA{% endblock %}
 
 {% block content %}
+<div class="page-header">
     <h2>Course Style Profile Generator</h2>
+    <p>
+        Generate a course style profile from past papers so TAPA can create quiz questions that better match your course style.
+    </p>
+</div>
 
-    <form method="POST" action="{{ url_for('main.generate_style_profile_route') }}">
-        <div style="margin-bottom: 10px;">
-            <label for="course_code">Course Code</label><br>
-            <input type="text" id="course_code" name="course_code" placeholder="Example: UECS3253" required>
+<div class="card style-profile-card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('main.generate_style_profile_route') }}">
+
+            <div class="mb-3">
+                <label class="form-label" for="course_code">Course Code</label>
+                <input class="form-control"
+                       type="text"
+                       id="course_code"
+                       name="course_code"
+                       placeholder="Example: UECS3253"
+                       required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Generate Style Profile
+            </button>
+        </form>
+
+        <div class="style-profile-note">
+            <strong>Note:</strong>
+            After generating, you can open it manually from
+            <code>past_papers/&lt;COURSE_CODE&gt;/style_profile.txt</code>
         </div>
-
-        <button type="submit">Generate Style Profile</button>
-    </form>
-
-    <hr>
-
-    <p>After generating, you can open it manually from:</p>
-    <p><code>past_papers/&lt;COURSE_CODE&gt;/style_profile.txt</code></p>
+    </div>
+</div>
 {% endblock %}

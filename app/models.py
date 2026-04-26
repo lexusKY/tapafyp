@@ -33,6 +33,13 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan"
     )
 
+    quiz_attempts = db.relationship(
+        "QuizAttempt",
+        backref="user",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
 
 class Material(db.Model):
     __tablename__ = "materials"
@@ -69,6 +76,13 @@ class Material(db.Model):
         cascade="all, delete-orphan"
     )
 
+    quiz_attempts = db.relationship(
+        "QuizAttempt",
+        backref="material",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
 
 class Question(db.Model):
     __tablename__ = "questions"
@@ -94,6 +108,13 @@ class Question(db.Model):
         cascade="all, delete-orphan"
     )
 
+    quiz_answers = db.relationship(
+        "QuizAnswer",
+        backref="question",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
 
 class Choice(db.Model):
     __tablename__ = "choices"
@@ -108,3 +129,81 @@ class Choice(db.Model):
 
     choice_text = db.Column(db.String(255), nullable=False)
     is_correct = db.Column(db.Boolean, default=False)
+
+    selected_answers = db.relationship(
+        "QuizAnswer",
+        foreign_keys="QuizAnswer.selected_choice_id",
+        backref="selected_choice",
+        lazy=True
+    )
+
+    correct_answers = db.relationship(
+        "QuizAnswer",
+        foreign_keys="QuizAnswer.correct_choice_id",
+        backref="correct_choice",
+        lazy=True
+    )
+
+
+class QuizAttempt(db.Model):
+    __tablename__ = "quiz_attempts"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=False
+    )
+
+    material_id = db.Column(
+        db.Integer,
+        db.ForeignKey("materials.id"),
+        nullable=False
+    )
+
+    level = db.Column(db.String(30), nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    total_questions = db.Column(db.Integer, nullable=False)
+
+    attempt_type = db.Column(db.String(20), nullable=False, default="normal")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    answers = db.relationship(
+        "QuizAnswer",
+        backref="attempt",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+
+class QuizAnswer(db.Model):
+    __tablename__ = "quiz_answers"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    attempt_id = db.Column(
+        db.Integer,
+        db.ForeignKey("quiz_attempts.id"),
+        nullable=False
+    )
+
+    question_id = db.Column(
+        db.Integer,
+        db.ForeignKey("questions.id"),
+        nullable=False
+    )
+
+    selected_choice_id = db.Column(
+        db.Integer,
+        db.ForeignKey("choices.id"),
+        nullable=True
+    )
+
+    correct_choice_id = db.Column(
+        db.Integer,
+        db.ForeignKey("choices.id"),
+        nullable=True
+    )
+
+    is_correct = db.Column(db.Boolean, nullable=False, default=False)

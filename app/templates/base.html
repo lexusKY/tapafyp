@@ -8,11 +8,12 @@
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('main.index') }}">TAPA</a>
 
         {% if current_user.is_authenticated %}
             <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
             <a class="nav-link" href="{{ url_for('main.upload') }}">Upload</a>
+            <a class="nav-link" href="{{ url_for('main.history') }}">History</a>
             <a class="nav-link" href="{{ url_for('main.profile') }}">Profile</a>
             <a class="nav-link" href="{{ url_for('main.course_style_page') }}">Course Style</a>
             <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
@@ -26,7 +27,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="flash-message">
+                    <div class="flash-message {{ category }}">
                         {{ message }}
                     </div>
                 {% endfor %}

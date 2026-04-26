@@ -3,78 +3,105 @@
 {% block title %}Quiz - TAPA{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <div class="question-meta">
-            {{ material.title }} · {{ level }} · Question {{ question_number }} of {{ total_questions }}
+{% set quiz_progress = ((question_number / total_questions) * 100) | round(0) %}
+
+<div class="quiz-play-page">
+
+    <div class="quiz-card">
+
+        <div class="quiz-top">
+            <div>
+                <div class="eyebrow">{{ material.title }}</div>
+                <h2>Question {{ question_number }} of {{ total_questions }}</h2>
+                <p>{{ level }} Level</p>
+            </div>
+
+            <div class="quiz-counter">
+                {{ question_number }}/{{ total_questions }}
+            </div>
         </div>
 
-        <div class="progress-wrap">
-            <progress value="{{ question_number }}" max="{{ total_questions }}" style="width: 100%; height: 18px;"></progress>
+        <div class="quiz-progress">
+            <div class="quiz-progress-fill" data-width="{{ quiz_progress }}"></div>
         </div>
 
-        <div class="question-text">{{ question.question_text }}</div>
+        <div class="quiz-question-text">
+            {{ question.question_text }}
+        </div>
 
         {% if question.hint %}
-            <div style="margin-bottom: 20px; padding: 12px 14px; background: #f4fbff; border: 1px solid #d9efff; border-radius: 12px;">
+            <div class="hint-box">
                 <strong>Hint:</strong> {{ question.hint }}
             </div>
         {% endif %}
 
         {% if feedback_mode %}
             <div class="feedback-box {% if feedback_correct %}feedback-correct{% else %}feedback-wrong{% endif %}">
-                <p style="margin-top: 0;">
-                    {% if feedback_correct %}
-                        <strong class="correct-text">Correct!</strong>
-                    {% else %}
-                        <strong class="wrong-text">Wrong.</strong>
-                    {% endif %}
-                </p>
+                {% if feedback_correct %}
+                    <strong class="correct-text">Correct!</strong>
+                {% else %}
+                    <strong class="wrong-text">Wrong.</strong>
+                {% endif %}
 
                 {% if correct_choice %}
                     <p><strong>Correct answer:</strong> {{ correct_choice.choice_text }}</p>
                 {% endif %}
 
                 {% if question.explanation %}
-                    <p style="margin-bottom: 0;"><strong>Explanation:</strong> {{ question.explanation }}</p>
+                    <p><strong>Explanation:</strong> {{ question.explanation }}</p>
                 {% endif %}
             </div>
         {% endif %}
 
         <form method="POST">
-            <div class="choice-list">
+            <div class="choice-list modern-choice-list">
                 {% for choice in question.choices %}
-                    <div class="choice-item">
-                        <label
-                            class="
-                                {% if feedback_mode and correct_choice and choice.id == correct_choice.id %}
-                                    choice-correct
-                                {% elif feedback_mode and selected_answer == choice.id and correct_choice and choice.id != correct_choice.id %}
-                                    choice-wrong
-                                {% endif %}
-                            "
+                    <label class="modern-choice
+                        {% if feedback_mode and correct_choice and choice.id == correct_choice.id %}
+                            choice-correct
+                        {% elif feedback_mode and selected_answer == choice.id and correct_choice and choice.id != correct_choice.id %}
+                            choice-wrong
+                        {% endif %}
+                    ">
+                        <input
+                            type="radio"
+                            name="selected_choice"
+                            value="{{ choice.id }}"
+                            {% if selected_answer == choice.id %}checked{% endif %}
+                            {% if feedback_mode %}disabled{% endif %}
                         >
-                            <input
-                                type="radio"
-                                name="selected_choice"
-                                value="{{ choice.id }}"
-                                {% if selected_answer == choice.id %}checked{% endif %}
-                                {% if feedback_mode %}disabled{% endif %}
-                            >
-                            {{ choice.choice_text }}
-                        </label>
-                    </div>
+                        <span>{{ choice.choice_text }}</span>
+                    </label>
                 {% endfor %}
             </div>
 
-            <div class="inline-actions">
+            <div class="quiz-actions">
+                <a href="{{ url_for('main.choose_level', material_id=material.id) }}" class="btn btn-outline-secondary">
+                    Exit Quiz
+                </a>
+
                 {% if feedback_mode %}
-                    <button type="submit" name="action" value="continue" class="btn">
+                    <button type="submit" name="action" value="continue" class="btn btn-primary">
                         {% if question_number == total_questions %}Finish Quiz{% else %}Continue{% endif %}
                     </button>
                 {% else %}
-                    <button type="submit" name="action" value="check" class="btn">Check</button>
+                    <button type="submit" name="action" value="check" class="btn btn-primary">
+                        Check Answer
+                    </button>
                 {% endif %}
             </div>
         </form>
+
     </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".quiz-progress-fill").forEach(function (bar) {
+            const width = bar.getAttribute("data-width") || "0";
+            bar.style.width = width + "%";
+        });
+    });
+</script>
 {% endblock %}

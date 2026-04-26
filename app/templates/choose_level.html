@@ -3,33 +3,64 @@
 {% block title %}Choose Level - TAPA{% endblock %}
 
 {% block content %}
-    <div class="card">
-        <div class="page-title">Choose Your Quiz Level</div>
-        <div class="page-subtitle">
-            <strong>{{ material.title }}</strong><br>
-            Course: {{ material.course_code }}
+<div class="quiz-level-page">
+
+    <div class="quiz-level-hero">
+        <div>
+            <div class="eyebrow">Quiz Setup</div>
+            <h2>Choose Your Quiz Level</h2>
+            <p>
+                Select a difficulty level for <strong>{{ material.title }}</strong>.
+                You can practise all questions or focus on one level.
+            </p>
         </div>
 
-        <div class="level-grid">
-            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='All') }}">
-                <div class="level-title">All</div>
-                <div class="level-count">{{ all_count }} questions</div>
-            </a>
-
-            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='Hot') }}">
-                <div class="level-title">Hot</div>
-                <div class="level-count">{{ hot_count }} questions</div>
-            </a>
-
-            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='Moderate') }}">
-                <div class="level-title">Moderate</div>
-                <div class="level-count">{{ moderate_count }} questions</div>
-            </a>
-
-            <a class="level-card" href="{{ url_for('main.start_quiz', material_id=material.id, level='Cold') }}">
-                <div class="level-title">Cold</div>
-                <div class="level-count">{{ cold_count }} questions</div>
-            </a>
+        <div class="quiz-level-meta">
+            <span>{{ material.course_code }}</span>
+            <span>{{ all_count }} total questions</span>
         </div>
     </div>
+
+    <div class="level-grid improved-level-grid">
+
+        <a class="level-card level-all" href="{{ url_for('main.start_quiz', material_id=material.id, level='All') }}">
+            <div class="level-icon">★</div>
+            <div class="level-title">All</div>
+            <div class="level-count">{{ all_count }} questions</div>
+            <div class="level-desc">Mixed practice from all difficulty levels.</div>
+        </a>
+
+        <a class="level-card level-hot" href="{{ url_for('main.start_quiz', material_id=material.id, level='Hot') }}">
+            <div class="level-icon">🔥</div>
+            <div class="level-title">Hot</div>
+            <div class="level-count">{{ hot_count }} questions</div>
+            <div class="level-desc">Harder questions for exam-style revision.</div>
+        </a>
+
+        <a class="level-card level-moderate" href="{{ url_for('main.start_quiz', material_id=material.id, level='Moderate') }}">
+            <div class="level-icon">⚡</div>
+            <div class="level-title">Moderate</div>
+            <div class="level-count">{{ moderate_count }} questions</div>
+            <div class="level-desc">Balanced questions for normal practice.</div>
+        </a>
+
+        <a class="level-card level-cold" href="{{ url_for('main.start_quiz', material_id=material.id, level='Cold') }}">
+            <div class="level-icon">❄️</div>
+            <div class="level-title">Cold</div>
+            <div class="level-count">{{ cold_count }} questions</div>
+            <div class="level-desc">Basic questions to warm up your memory.</div>
+        </a>
+
+    </div>
+
+    <div class="level-bottom-actions">
+        <a href="{{ url_for('main.view_material', material_id=material.id) }}" class="btn btn-outline-secondary">
+            Back to Material
+        </a>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary">
+            Dashboard
+        </a>
+    </div>
+
+</div>
 {% endblock %}
