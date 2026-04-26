@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Generating Quiz - TAPA{% endblock %}
+
+{% block content %}
+<div class="confirm-page">
+    <div class="confirm-card">
+        <div class="confirm-icon">✨</div>
+        <div class="eyebrow">Generating Quiz</div>
+        <h2>Preparing your quiz...</h2>
+        <p>TAPA is generating questions from your reviewed material. Please continue to start the generation.</p>
+
+        <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}">
+            <button type="submit" class="btn btn-primary">
+                Generate Now
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

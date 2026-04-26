@@ -19,9 +19,11 @@
                 Start Quiz
             </a>
 
-            <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}" class="btn btn-outline-primary">
-                Regenerate
-            </a>
+            <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}" class="inline-action-form">
+                <button type="submit" class="btn btn-outline-primary">
+                    Regenerate
+                </button>
+            </form>
         </div>
     </div>
 

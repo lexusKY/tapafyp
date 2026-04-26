@@ -31,10 +31,11 @@
                     Start Quiz
                 </a>
             {% else %}
-                <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
-                   class="btn btn-primary">
-                    Generate Quiz
-                </a>
+                <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}" class="inline-action-form">
+                    <button type="submit" class="btn btn-primary">
+                        Generate Quiz
+                    </button>
+                </form>
             {% endif %}
         </div>
     </div>
@@ -143,10 +144,11 @@
                             Edit Review / Preferences
                         </a>
 
-                        <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}"
-                        class="btn btn-primary">
-                            Generate / Regenerate Quiz
-                        </a>
+                        <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}">
+                            <button type="submit" class="btn btn-primary w-100">
+                                Generate / Regenerate Quiz
+                            </button>
+                        </form>
 
                         {% if question_count > 0 %}
                             <a href="{{ url_for('main.question_bank', material_id=material.id) }}"

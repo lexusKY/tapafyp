@@ -321,7 +321,20 @@ def review_material(material_id):
         db.session.commit()
 
         if action == "generate":
-            return redirect(url_for("main.generate_quiz", material_id=material.id))
+            existing_question_count = Question.query.filter_by(
+                material_id=material.id
+            ).count()
+
+            if existing_question_count > 0:
+                return redirect(url_for(
+                    "main.regenerate_confirm",
+                    material_id=material.id
+                ))
+
+            return redirect(url_for(
+                "main.generate_first_quiz",
+                material_id=material.id
+            ))
 
         flash("Material review and quiz preferences saved.", "success")
         return redirect(url_for("main.view_material", material_id=material.id))
@@ -332,11 +345,51 @@ def review_material(material_id):
 
     return render_template("material_review.html", material=material)
 
+@main.route("/material/<int:material_id>/regenerate-confirm")
+@login_required
+def regenerate_confirm(material_id):
+    material = get_user_material_or_404(material_id)
 
-@main.route("/generate-quiz/<int:material_id>", methods=["GET", "POST"])
+    question_count = Question.query.filter_by(material_id=material.id).count()
+
+    if question_count == 0:
+        return redirect(url_for("main.generate_quiz", material_id=material.id))
+
+    attempt_count = (
+        QuizAttempt.query
+        .filter_by(user_id=current_user.id, material_id=material.id)
+        .count()
+    )
+
+    return render_template(
+        "regenerate_confirm.html",
+        material=material,
+        question_count=question_count,
+        attempt_count=attempt_count
+    )
+
+@main.route("/generate-first-quiz/<int:material_id>")
+@login_required
+def generate_first_quiz(material_id):
+    material = get_user_material_or_404(material_id)
+
+    question_count = Question.query.filter_by(material_id=material.id).count()
+
+    if question_count > 0:
+        return redirect(url_for("main.regenerate_confirm", material_id=material.id))
+
+    return render_template("generate_first_quiz.html", material=material)
+
+@main.route("/generate-quiz/<int:material_id>", methods=["POST"])
 @login_required
 def generate_quiz(material_id):
     material = get_user_material_or_404(material_id)
+
+    existing_question_count = Question.query.filter_by(material_id=material.id).count()
+    confirm_regenerate = request.form.get("confirm_regenerate") == "yes"
+
+    if existing_question_count > 0 and not confirm_regenerate:
+        return redirect(url_for("main.regenerate_confirm", material_id=material.id))
 
     source_text = material.cleaned_text or material.extracted_text
 

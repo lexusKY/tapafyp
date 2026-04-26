@@ -2491,3 +2491,132 @@ button:not(.btn):hover {
         width: 100%;
     }
 }
+
+/* ============================================================
+   Regenerate Confirmation UI
+   ============================================================ */
+
+.confirm-page {
+    min-height: calc(100vh - 180px);
+    display: grid;
+    place-items: center;
+}
+
+.confirm-card {
+    width: min(720px, 100%);
+    padding: 36px;
+    border-radius: var(--r-2xl);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-hover);
+    text-align: center;
+}
+
+.confirm-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    background: var(--a-50);
+    font-size: 2rem;
+}
+
+.confirm-card h2 {
+    margin-bottom: 12px;
+}
+
+.confirm-card > p {
+    max-width: 620px;
+    margin: 0 auto 18px;
+    color: var(--ink-600);
+}
+
+.confirm-warning-box,
+.confirm-info-box {
+    margin: 18px 0;
+    padding: 15px 16px;
+    border-radius: var(--r-lg);
+    text-align: left;
+    font-weight: 700;
+}
+
+.confirm-warning-box {
+    background: var(--a-50);
+    color: var(--a-700);
+    border-left: 4px solid var(--a-400);
+}
+
+.confirm-info-box {
+    background: var(--v-50);
+    color: var(--v-700);
+    border-left: 4px solid var(--v-500);
+}
+
+.confirm-summary {
+    display: grid;
+    gap: 10px;
+    margin: 22px 0;
+    text-align: left;
+}
+
+.confirm-summary div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 14px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+
+.confirm-summary span {
+    color: var(--ink-500);
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+
+.confirm-summary strong {
+    text-align: right;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.inline-action-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.workspace-hero-actions form,
+.question-bank-actions form {
+    margin: 0;
+}
+
+@media (max-width: 560px) {
+    .confirm-card {
+        padding: 24px;
+    }
+
+    .confirm-summary div {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .confirm-summary strong {
+        text-align: left;
+    }
+
+    .confirm-actions,
+    .confirm-actions form,
+    .inline-action-form,
+    .inline-action-form .btn {
+        width: 100%;
+    }
+}

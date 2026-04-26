@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Regeneration - TAPA{% endblock %}
+
+{% block content %}
+<div class="confirm-page">
+
+    <div class="confirm-card">
+        <div class="confirm-icon">⚠️</div>
+
+        <div class="eyebrow">Regenerate Quiz</div>
+
+        <h2>Replace existing generated questions?</h2>
+
+        <p>
+            This material already has <strong>{{ question_count }}</strong> generated question(s).
+            Regenerating will replace the current question bank with a new set based on the latest reviewed text and quiz preferences.
+        </p>
+
+        {% if attempt_count > 0 %}
+            <div class="confirm-warning-box">
+                <strong>Important:</strong>
+                This material also has <strong>{{ attempt_count }}</strong> saved quiz attempt(s).
+                The saved attempt results will remain in history, but the current question bank will be replaced.
+            </div>
+        {% else %}
+            <div class="confirm-info-box">
+                No saved quiz attempts are linked to this material yet.
+            </div>
+        {% endif %}
+
+        <div class="confirm-summary">
+            <div>
+                <span>Material</span>
+                <strong>{{ material.title }}</strong>
+            </div>
+
+            <div>
+                <span>Course</span>
+                <strong>{{ material.course_code or '-' }}</strong>
+            </div>
+
+            <div>
+                <span>New Question Count Preference</span>
+                <strong>{{ material.question_count or 5 }}</strong>
+            </div>
+
+            <div>
+                <span>Difficulty Preference</span>
+                <strong>{{ material.quiz_difficulty or 'All' }}</strong>
+            </div>
+        </div>
+
+        <div class="confirm-actions">
+            <a href="{{ url_for('main.view_material', material_id=material.id) }}"
+               class="btn btn-outline-secondary">
+                Cancel
+            </a>
+
+            <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}">
+                <input type="hidden" name="confirm_regenerate" value="yes">
+                <button type="submit" class="btn btn-primary">
+                    Yes, Regenerate Quiz
+                </button>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
