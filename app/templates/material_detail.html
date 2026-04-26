@@ -158,19 +158,24 @@
                         </form>
 
                         {% if question_count > 0 %}
-                            <a href="{{ url_for('main.question_bank', material_id=material.id) }}"
-                            class="btn btn-outline-primary">
-                                View Generated Questions
-                            </a>
-
                             <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
                             class="btn btn-outline-primary">
                                 Start Existing Quiz
                             </a>
 
+                            <a href="{{ url_for('main.question_bank', material_id=material.id) }}"
+                            class="btn btn-outline-primary">
+                                View Generated Questions
+                            </a>
+
                             <a href="{{ url_for('main.material_attempts', material_id=material.id) }}"
                             class="btn btn-outline-primary">
                                 View Material Attempts
+                            </a>
+
+                            <a href="{{ url_for('main.export_question_bank', material_id=material.id) }}"
+                            class="btn btn-outline-primary">
+                                Export Question Bank
                             </a>
                         {% endif %}
 

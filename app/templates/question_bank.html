@@ -19,7 +19,16 @@
                 Start Quiz
             </a>
 
-            <form method="POST" action="{{ url_for('main.generate_quiz', material_id=material.id) }}" class="inline-action-form">
+            <a href="{{ url_for('main.export_question_bank', material_id=material.id) }}"
+            class="btn btn-outline-primary">
+                Export TXT
+            </a>
+
+            <form method="POST"
+                action="{{ url_for('main.generate_quiz', material_id=material.id) }}"
+                class="inline-action-form"
+                data-loading="true"
+                data-loading-type="regenerate">
                 <button type="submit" class="btn btn-outline-primary">
                     Regenerate
                 </button>
@@ -56,6 +65,10 @@
 
         <a href="{{ url_for('main.review_material', material_id=material.id) }}" class="btn btn-outline-primary">
             Edit Review / Preferences
+        </a>
+
+        <a href="{{ url_for('main.export_question_bank', material_id=material.id) }}" class="btn btn-outline-primary">
+            Download Question Bank
         </a>
     </div>
 

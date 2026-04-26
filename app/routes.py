@@ -1,6 +1,6 @@
 import os
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, session, Response
 from flask_login import login_required, current_user
 
 from app import db
@@ -290,6 +290,83 @@ def question_bank(material_id):
         hot_count=hot_count,
         moderate_count=moderate_count,
         cold_count=cold_count
+    )
+
+@main.route("/material/<int:material_id>/questions/export")
+@login_required
+def export_question_bank(material_id):
+    material = get_user_material_or_404(material_id)
+
+    questions = (
+        Question.query
+        .filter_by(material_id=material.id)
+        .order_by(Question.id.asc())
+        .all()
+    )
+
+    if not questions:
+        flash("No generated questions available to export.", "warning")
+        return redirect(url_for("main.view_material", material_id=material.id))
+
+    lines = []
+
+    lines.append("TAPA Generated Question Bank")
+    lines.append("=" * 32)
+    lines.append(f"Material Title: {material.title}")
+    lines.append(f"Course Code: {material.course_code or '-'}")
+    lines.append(f"Source File(s): {material.filename}")
+    lines.append(f"Total Questions: {len(questions)}")
+    lines.append("")
+    lines.append("-" * 60)
+    lines.append("")
+
+    for index, question in enumerate(questions, start=1):
+        lines.append(f"Question {index}")
+        lines.append(f"Difficulty: {question.difficulty}")
+        lines.append("")
+        lines.append(question.question_text)
+        lines.append("")
+
+        choices = question.choices
+
+        for choice_index, choice in enumerate(choices):
+            letter = chr(65 + choice_index)
+            marker = " [Correct]" if choice.is_correct else ""
+            lines.append(f"{letter}. {choice.choice_text}{marker}")
+
+        correct_choice = next((choice for choice in choices if choice.is_correct), None)
+
+        lines.append("")
+
+        if correct_choice:
+            correct_letter = chr(65 + choices.index(correct_choice))
+            lines.append(f"Correct Answer: {correct_letter}. {correct_choice.choice_text}")
+        else:
+            lines.append("Correct Answer: N/A")
+
+        if question.hint:
+            lines.append("")
+            lines.append(f"Hint: {question.hint}")
+
+        if question.explanation:
+            lines.append("")
+            lines.append(f"Explanation: {question.explanation}")
+
+        lines.append("")
+        lines.append("-" * 60)
+        lines.append("")
+
+    export_text = "\n".join(lines)
+
+    safe_title = secure_filename(material.title or "question_bank")
+    filename = f"{safe_title}_question_bank.txt"
+
+    return Response(
+        export_text,
+        mimetype="text/plain",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}"
+        }
     )
 
 @main.route("/material/<int:material_id>/review", methods=["GET", "POST"])
