@@ -252,6 +252,45 @@ def view_material(material_id):
         recent_attempts=recent_attempts
     )
 
+@main.route("/material/<int:material_id>/questions")
+@login_required
+def question_bank(material_id):
+    material = get_user_material_or_404(material_id)
+
+    questions = (
+        Question.query
+        .filter_by(material_id=material.id)
+        .order_by(Question.id.asc())
+        .all()
+    )
+
+    if not questions:
+        flash("No generated questions found yet. Generate a quiz first.", "warning")
+        return redirect(url_for("main.view_material", material_id=material.id))
+
+    hot_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Hot"
+    ).count()
+
+    moderate_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Moderate"
+    ).count()
+
+    cold_count = Question.query.filter_by(
+        material_id=material.id,
+        difficulty="Cold"
+    ).count()
+
+    return render_template(
+        "question_bank.html",
+        material=material,
+        questions=questions,
+        hot_count=hot_count,
+        moderate_count=moderate_count,
+        cold_count=cold_count
+    )
 
 @main.route("/material/<int:material_id>/review", methods=["GET", "POST"])
 @login_required

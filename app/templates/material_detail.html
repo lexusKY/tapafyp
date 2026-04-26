@@ -21,6 +21,11 @@
             </a>
 
             {% if question_count > 0 %}
+                <a href="{{ url_for('main.question_bank', material_id=material.id) }}"
+                   class="btn btn-outline-primary">
+                    View Questions
+                </a>
+
                 <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
                    class="btn btn-primary">
                     Start Quiz
@@ -144,6 +149,11 @@
                         </a>
 
                         {% if question_count > 0 %}
+                            <a href="{{ url_for('main.question_bank', material_id=material.id) }}"
+                               class="btn btn-outline-primary">
+                                View Generated Questions
+                            </a>
+
                             <a href="{{ url_for('main.choose_level', material_id=material.id) }}"
                                class="btn btn-outline-primary">
                                 Start Existing Quiz

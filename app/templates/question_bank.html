@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Generated Questions - TAPA{% endblock %}
+
+{% block content %}
+<div class="question-bank-page">
+
+    <div class="question-bank-hero">
+        <div>
+            <div class="eyebrow">Generated Question Bank</div>
+            <h2>{{ material.title }}</h2>
+            <p>
+                Review all AI-generated MCQs for {{ material.course_code or 'this material' }} before starting the quiz.
+            </p>
+        </div>
+
+        <div class="question-bank-actions">
+            <a href="{{ url_for('main.choose_level', material_id=material.id) }}" class="btn btn-primary">
+                Start Quiz
+            </a>
+
+            <a href="{{ url_for('main.generate_quiz', material_id=material.id) }}" class="btn btn-outline-primary">
+                Regenerate
+            </a>
+        </div>
+    </div>
+
+    <div class="question-bank-stats">
+        <div class="question-bank-stat">
+            <span>Total Questions</span>
+            <strong>{{ questions|length }}</strong>
+        </div>
+
+        <div class="question-bank-stat">
+            <span>Hot</span>
+            <strong>{{ hot_count }}</strong>
+        </div>
+
+        <div class="question-bank-stat">
+            <span>Moderate</span>
+            <strong>{{ moderate_count }}</strong>
+        </div>
+
+        <div class="question-bank-stat">
+            <span>Cold</span>
+            <strong>{{ cold_count }}</strong>
+        </div>
+    </div>
+
+    <div class="question-bank-toolbar">
+        <a href="{{ url_for('main.view_material', material_id=material.id) }}" class="btn btn-outline-secondary">
+            Back to Material
+        </a>
+
+        <a href="{{ url_for('main.review_material', material_id=material.id) }}" class="btn btn-outline-primary">
+            Edit Review / Preferences
+        </a>
+    </div>
+
+    <div class="question-bank-list">
+        {% for question in questions %}
+            <div class="question-bank-card">
+
+                <div class="question-bank-card-top">
+                    <div class="question-number-pill">
+                        Q{{ loop.index }}
+                    </div>
+
+                    {% if question.difficulty == "Hot" %}
+                        <span class="qb-difficulty qb-hot">Hot</span>
+                    {% elif question.difficulty == "Moderate" %}
+                        <span class="qb-difficulty qb-moderate">Moderate</span>
+                    {% else %}
+                        <span class="qb-difficulty qb-cold">Cold</span>
+                    {% endif %}
+                </div>
+
+                <h3>{{ question.question_text }}</h3>
+
+                {% if question.hint %}
+                    <div class="qb-hint">
+                        <strong>Hint</strong>
+                        <p>{{ question.hint }}</p>
+                    </div>
+                {% endif %}
+
+                <div class="qb-choice-list">
+                    {% for choice in question.choices %}
+                        <div class="qb-choice {% if choice.is_correct %}qb-choice-correct{% endif %}">
+                            <span class="qb-choice-letter">
+                                {{ ['A', 'B', 'C', 'D'][loop.index0] }}
+                            </span>
+
+                            <span class="qb-choice-text">
+                                {{ choice.choice_text }}
+                            </span>
+
+                            {% if choice.is_correct %}
+                                <span class="qb-correct-tag">Correct</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {% if question.explanation %}
+                    <div class="qb-explanation">
+                        <strong>Explanation</strong>
+                        <p>{{ question.explanation }}</p>
+                    </div>
+                {% endif %}
+
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
