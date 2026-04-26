@@ -56,7 +56,7 @@
                                       rows="24"
                                       required>{{ material.cleaned_text or material.extracted_text or '' }}</textarea>
                             <div class="form-text">
-                                You may edit this text to fix table, formula, spacing, or extraction problems.
+                                You may edit this text manually, or click AI Clean Text to improve spacing, tables, formulas, and repeated headers before quiz generation.
                             </div>
                         </div>
                     </div>
@@ -129,6 +129,13 @@
                                     value="save"
                                     class="btn btn-outline-primary">
                                 Save Review
+                            </button>
+
+                            <button type="submit"
+                                    formaction="{{ url_for('main.clean_material_text', material_id=material.id) }}"
+                                    formmethod="POST"
+                                    class="btn btn-ai-clean">
+                                AI Clean Text
                             </button>
 
                             <button type="submit"

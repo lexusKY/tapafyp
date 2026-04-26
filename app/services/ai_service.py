@@ -39,6 +39,55 @@ Your task:
         print(f"Gemini extraction error: {e}")
         return None
 
+def clean_extracted_text_with_ai(extracted_text, api_key):
+    try:
+        client = genai.Client(api_key=api_key)
+
+        shortened_text = (extracted_text or "")[:30000]
+
+        if not shortened_text.strip():
+            return None
+
+        prompt = f"""
+You are cleaning extracted lecture note text for TAPA, an educational quiz generation system.
+
+Your task is to improve the formatting of the extracted text without changing the meaning.
+
+Clean the text using these rules:
+1. Do not summarize the content.
+2. Do not remove important learning content.
+3. Remove repeated headers, footers, page numbers, and duplicated navigation text when clearly unnecessary.
+4. Fix broken line breaks and spacing.
+5. Preserve headings and subheadings clearly.
+6. Preserve bullet points and numbered lists.
+7. Preserve formulas, calculations, symbols, and equations as accurately as possible.
+8. If table-like content appears, convert it into a clear markdown-style table where possible.
+9. Keep code snippets, formulas, and calculation steps on separate lines when needed.
+10. Do not add new facts that are not in the original text.
+11. Return only the cleaned text.
+12. Do not explain what you changed.
+13. If a very long base64 image string appears, do not keep the full string. Replace it with a short placeholder such as [base64 image data omitted], while preserving the surrounding code structure.
+
+Extracted text:
+{shortened_text}
+"""
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0
+            )
+        )
+
+        if response.text:
+            return response.text.strip()
+
+        return None
+
+    except Exception as e:
+        print(f"Gemini text cleaning error: {e}")
+        return None
 
 def generate_mcqs_from_text(
     extracted_text,

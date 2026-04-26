@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.models import Material, Question, Choice, QuizAttempt, QuizAnswer
-from app.services.ai_service import generate_mcqs_from_text
+from app.services.ai_service import generate_mcqs_from_text, clean_extracted_text_with_ai
 from app.services.course_profile_service import build_style_profile_for_course
 from app.services.lecture_file_service import extract_text_from_file, combine_extracted_text
 
@@ -344,6 +344,41 @@ def review_material(material_id):
         db.session.commit()
 
     return render_template("material_review.html", material=material)
+
+@main.route("/material/<int:material_id>/clean-text", methods=["POST"])
+@login_required
+def clean_material_text(material_id):
+    material = get_user_material_or_404(material_id)
+
+    current_text = request.form.get("cleaned_text", "").strip()
+
+    if not current_text:
+        current_text = material.cleaned_text or material.extracted_text or ""
+
+    if not current_text.strip():
+        flash("There is no extracted text to clean.", "warning")
+        return redirect(url_for("main.review_material", material_id=material.id))
+
+    gemini_api_key = current_app.config.get("GEMINI_API_KEY")
+
+    if not gemini_api_key:
+        flash("Gemini API key is missing.", "danger")
+        return redirect(url_for("main.review_material", material_id=material.id))
+
+    cleaned_text = clean_extracted_text_with_ai(
+        current_text,
+        gemini_api_key
+    )
+
+    if not cleaned_text:
+        flash("AI text cleaning failed. Please try again or edit the text manually.", "danger")
+        return redirect(url_for("main.review_material", material_id=material.id))
+
+    material.cleaned_text = cleaned_text
+    db.session.commit()
+
+    flash("Extracted text cleaned successfully using AI.", "success")
+    return redirect(url_for("main.review_material", material_id=material.id))
 
 @main.route("/material/<int:material_id>/regenerate-confirm")
 @login_required

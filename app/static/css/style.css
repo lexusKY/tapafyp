@@ -2620,3 +2620,31 @@ button:not(.btn):hover {
         width: 100%;
     }
 }
+
+/* ============================================================
+   AI Clean Text Button
+   ============================================================ */
+
+.btn-ai-clean {
+    color: #ffffff;
+    background: linear-gradient(135deg, #00c9a7, #6c5ce7);
+    border-color: transparent;
+    box-shadow: 0 6px 20px rgba(0, 201, 167, 0.24);
+}
+
+.btn-ai-clean:hover {
+    color: #ffffff;
+    filter: brightness(1.05);
+    box-shadow: 0 8px 24px rgba(108, 92, 231, 0.28);
+}
+
+.ai-clean-note {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: var(--r-lg);
+    background: var(--m-50);
+    color: var(--m-700);
+    border-left: 4px solid var(--m-400);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
