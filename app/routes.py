@@ -96,6 +96,23 @@ def format_duration(seconds):
 
     return f"{minutes}m {remaining_seconds}s"
 
+def is_profile_complete(user):
+    return all([
+        user.full_name,
+        user.student_id,
+        user.programme,
+        user.faculty,
+        user.year_of_study
+    ])
+
+
+def require_complete_profile():
+    if not is_profile_complete(current_user):
+        flash("Please complete your student profile before using TAPA.", "info")
+        return redirect(url_for("main.profile"))
+
+    return None
+
 
 def save_quiz_attempt(material, level, score, total_questions, results, attempt_type="normal", duration_seconds=None):
     attempt = QuizAttempt(
@@ -133,6 +150,10 @@ def index():
 @main.route("/dashboard")
 @login_required
 def dashboard():
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+
     materials = (
         Material.query
         .filter_by(user_id=current_user.id)
@@ -161,6 +182,10 @@ def dashboard():
 @main.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     if request.method == "POST":
         title = request.form.get("title", "").strip()
         course_code = request.form.get("course_code", "").strip().upper()
@@ -237,6 +262,9 @@ def upload():
 @main.route("/material/<int:material_id>")
 @login_required
 def view_material(material_id):
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
     material = get_user_material_or_404(material_id)
 
     question_count = Question.query.filter_by(material_id=material.id).count()
@@ -394,6 +422,10 @@ def export_question_bank(material_id):
 @main.route("/material/<int:material_id>/review", methods=["GET", "POST"])
 @login_required
 def review_material(material_id):
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     material = get_user_material_or_404(material_id)
 
     if request.method == "POST":
@@ -517,6 +549,10 @@ def generate_first_quiz(material_id):
 @main.route("/generate-quiz/<int:material_id>", methods=["POST"])
 @login_required
 def generate_quiz(material_id):
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     material = get_user_material_or_404(material_id)
 
     existing_question_count = Question.query.filter_by(material_id=material.id).count()
@@ -596,6 +632,10 @@ def generate_quiz(material_id):
 @main.route("/choose-level/<int:material_id>")
 @login_required
 def choose_level(material_id):
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     material = get_user_material_or_404(material_id)
     questions = Question.query.filter_by(material_id=material.id).all()
 
@@ -633,6 +673,10 @@ def choose_level(material_id):
 @main.route("/start-quiz/<int:material_id>/<level>")
 @login_required
 def start_quiz(material_id, level):
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     material = get_user_material_or_404(material_id)
 
     if level not in VALID_DIFFICULTIES:
@@ -822,7 +866,7 @@ def quiz_result(material_id, level):
         level=level,
         retry_available=retry_available,
         attempt=attempt,
-        duration_text=format_duration(duration_seconds)
+        duration_text=format_duration(attempt.duration_seconds)
     )
 
 
@@ -1018,13 +1062,17 @@ def retry_result(material_id, level):
         level=f"{level} Retry",
         retry_available=False,
         attempt=attempt,
-        duration_text=format_duration(duration_seconds)
+        duration_text=format_duration(attempt.duration_seconds)
     )
 
 
 @main.route("/history")
 @login_required
 def history():
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     attempts = (
         QuizAttempt.query
         .filter_by(user_id=current_user.id)
@@ -1079,6 +1127,10 @@ def material_attempts(material_id):
 @main.route("/notes")
 @login_required
 def notes_library():
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     materials = (
         Material.query
         .filter_by(user_id=current_user.id)
@@ -1107,6 +1159,10 @@ def notes_library():
 @main.route("/material/<int:material_id>/notes", methods=["GET", "POST"])
 @login_required
 def material_notes(material_id):
+    profile_redirect = require_complete_profile()
+    if profile_redirect:
+        return profile_redirect
+    
     material = get_user_material_or_404(material_id)
 
     note = (
@@ -1228,7 +1284,13 @@ def profile():
 
         db.session.commit()
 
-        flash("Student profile updated successfully.", "success")
+        material_count = Material.query.filter_by(user_id=current_user.id).count()
+
+        flash("Profile saved successfully.", "success")
+
+        if material_count == 0:
+            return redirect(url_for("main.upload"))
+
         return redirect(url_for("main.profile"))
 
     materials = (

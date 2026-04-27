@@ -72,6 +72,17 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             flash("Login successful.", "success")
+
+            if (
+                not user.full_name
+                or not user.student_id
+                or not user.programme
+                or not user.faculty
+                or not user.year_of_study
+            ):
+                flash("Please complete your student profile before starting.", "info")
+                return redirect(url_for("main.profile"))
+
             return redirect(url_for("main.dashboard"))
         else:
             flash("Invalid email or password.", "danger")
