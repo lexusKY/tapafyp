@@ -233,8 +233,14 @@
 
                     <div class="card-body">
                         <div class="workspace-tool-grid">
+                            <a href="{{ url_for('main.material_notes', material_id=material.id) }}"
+                            class="workspace-tool-card">
+                                <strong>Study Notes</strong>
+                                <span>Write notes for this material</span>
+                            </a>
+
                             <a href="{{ url_for('main.question_bank', material_id=material.id) }}"
-                               class="workspace-tool-card">
+                            class="workspace-tool-card">
                                 <strong>View Questions</strong>
                                 <span>Preview generated MCQs</span>
                             </a>

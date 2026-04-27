@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}Material Notes - TAPA{% endblock %}
+
+{% block content %}
+<div class="material-notes-page">
+
+    <div class="material-notes-hero">
+        <div>
+            <div class="eyebrow">Study Notes</div>
+            <h2>{{ material.title }}</h2>
+            <p>
+                {{ material.course_code or 'No course code' }} · Write notes while reviewing generated questions and explanations.
+            </p>
+        </div>
+
+        <div class="material-notes-hero-actions">
+            <a href="{{ url_for('main.view_material', material_id=material.id) }}"
+               class="btn btn-outline-primary">
+                Material Workspace
+            </a>
+
+            <a href="{{ url_for('main.notes_library') }}"
+               class="btn btn-primary">
+                Notes Library
+            </a>
+        </div>
+    </div>
+
+    <div class="material-notes-layout">
+
+        <div class="notes-reference-panel">
+            <div class="card notes-section-card">
+                <div class="card-header bg-white notes-question-header">
+                    <div>
+                        <h5 class="mb-0 fw-semibold">Question Reference</h5>
+                        <p class="text-muted mb-0">
+                            Review the generated questions while writing your notes.
+                        </p>
+                    </div>
+
+                    {% if material.questions and material.questions|length > 0 %}
+                        <a href="{{ url_for('main.question_bank', material_id=material.id) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            Question Bank
+                        </a>
+                    {% endif %}
+                </div>
+
+                <div class="card-body">
+                    <div class="notes-reference-meta">
+                        <div>
+                            <span>Course</span>
+                            <strong>{{ material.course_code or '-' }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Files</span>
+                            <strong>{{ material.filename }}</strong>
+                        </div>
+                    </div>
+
+                    {% if material.questions and material.questions|length > 0 %}
+                        <div class="notes-question-list">
+                            {% for question in material.questions %}
+                                {% set correct_choice = question.choices | selectattr("is_correct") | list | first %}
+
+                                <div class="notes-question-card">
+                                    <div class="notes-question-top">
+                                        <span class="question-number-pill">Q{{ loop.index }}</span>
+                                        <span class="badge bg-light text-dark border">
+                                            {{ question.difficulty }}
+                                        </span>
+                                    </div>
+
+                                    <h6>{{ question.question_text | render_question_text }}</h6>
+
+                                    {% if correct_choice %}
+                                        <div class="notes-answer-box">
+                                            <strong>Correct Answer</strong>
+                                            <p>{{ correct_choice.choice_text }}</p>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if question.explanation %}
+                                        <div class="notes-explanation-box">
+                                            <strong>Explanation</strong>
+                                            <p>{{ question.explanation }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state compact">
+                            <h3>No generated questions yet</h3>
+                            <p>
+                                Generate a quiz first, then return here to write notes beside the questions.
+                            </p>
+
+                            <a href="{{ url_for('main.review_material', material_id=material.id) }}"
+                               class="btn btn-primary">
+                                Review / Generate Quiz
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="notes-editor-panel">
+            <div class="card notes-section-card sticky-note-editor-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-semibold">Your Notes</h5>
+                </div>
+
+                <div class="card-body">
+                    <form method="POST"
+                          action="{{ url_for('main.material_notes', material_id=material.id) }}"
+                          data-no-loading="true">
+
+                        <div class="rich-note-toolbar">
+                            <button type="button"
+                                    class="rich-color-btn active"
+                                    data-color="black">
+                                <span class="note-color-dot black"></span>
+                                Black
+                            </button>
+
+                            <button type="button"
+                                    class="rich-color-btn"
+                                    data-color="blue">
+                                <span class="note-color-dot blue"></span>
+                                Blue
+                            </button>
+
+                            <button type="button"
+                                    class="rich-color-btn"
+                                    data-color="red">
+                                <span class="note-color-dot red"></span>
+                                Red
+                            </button>
+                        </div>
+
+                        <input type="hidden"
+                               name="note_text"
+                               id="noteTextInput"
+                               value="{{ note.note_text if note else '' }}">
+
+                        <input type="hidden"
+                               name="note_color"
+                               value="black">
+
+                        <div id="richNoteEditor"
+                             class="rich-note-editor"
+                             contenteditable="true"
+                             data-placeholder="Write your study notes here...">{{ note.note_text | safe if note else '' }}</div>
+
+                        <div class="material-note-actions">
+                            <button type="submit" class="btn btn-primary">
+                                Save Notes
+                            </button>
+
+                            <a href="{{ url_for('main.notes_library') }}"
+                               class="btn btn-outline-secondary">
+                                Back to Notes Library
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editor = document.getElementById("richNoteEditor");
+        const hiddenInput = document.getElementById("noteTextInput");
+        const colorButtons = document.querySelectorAll(".rich-color-btn");
+        const form = editor.closest("form");
+
+        function setActiveButton(color) {
+            colorButtons.forEach(function (button) {
+                button.classList.toggle("active", button.dataset.color === color);
+            });
+        }
+
+        function applyColor(color) {
+            editor.focus();
+
+            if (color === "black") {
+                document.execCommand("foreColor", false, "#111827");
+            } else if (color === "blue") {
+                document.execCommand("foreColor", false, "#2563eb");
+            } else if (color === "red") {
+                document.execCommand("foreColor", false, "#dc2626");
+            }
+
+            setActiveButton(color);
+        }
+
+        colorButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                applyColor(button.dataset.color);
+            });
+        });
+
+        editor.addEventListener("input", function () {
+            hiddenInput.value = editor.innerHTML;
+        });
+
+        form.addEventListener("submit", function () {
+            hiddenInput.value = editor.innerHTML;
+        });
+    });
+</script>
+{% endblock %}

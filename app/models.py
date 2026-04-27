@@ -86,6 +86,31 @@ class Material(db.Model):
         cascade="all, delete-orphan"
     )
 
+class MaterialNote(db.Model):
+    __tablename__ = "material_notes"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=False
+    )
+
+    material_id = db.Column(
+        db.Integer,
+        db.ForeignKey("materials.id"),
+        nullable=False
+    )
+
+    note_text = db.Column(db.Text, nullable=True)
+    note_color = db.Column(db.String(20), nullable=False, default="black")
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship("User", backref=db.backref("material_notes", lazy=True, cascade="all, delete-orphan"))
+    material = db.relationship("Material", backref=db.backref("study_notes", lazy=True, cascade="all, delete-orphan"))
 
 class Question(db.Model):
     __tablename__ = "questions"

@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, current_app, request, redirect, ur
 from flask_login import login_required, current_user
 
 from app import db
-from app.models import Material, Question, Choice, QuizAttempt, QuizAnswer
+from app.models import Material, MaterialNote, Question, Choice, QuizAttempt, QuizAnswer
 from app.services.ai_service import generate_mcqs_from_text, clean_extracted_text_with_ai
 from app.services.course_profile_service import build_style_profile_for_course
 from app.services.lecture_file_service import extract_text_from_file, combine_extracted_text
@@ -1025,6 +1025,75 @@ def material_attempts(material_id):
         retry_count=retry_count
     )
 
+@main.route("/notes")
+@login_required
+def notes_library():
+    materials = (
+        Material.query
+        .filter_by(user_id=current_user.id)
+        .order_by(Material.is_pinned.desc(), Material.updated_at.desc(), Material.id.desc())
+        .all()
+    )
+
+    note_map = {}
+
+    notes = (
+        MaterialNote.query
+        .filter_by(user_id=current_user.id)
+        .all()
+    )
+
+    for note in notes:
+        note_map[note.material_id] = note
+
+    return render_template(
+        "notes_library.html",
+        materials=materials,
+        note_map=note_map
+    )
+
+
+@main.route("/material/<int:material_id>/notes", methods=["GET", "POST"])
+@login_required
+def material_notes(material_id):
+    material = get_user_material_or_404(material_id)
+
+    note = (
+        MaterialNote.query
+        .filter_by(user_id=current_user.id, material_id=material.id)
+        .first()
+    )
+
+    if request.method == "POST":
+        note_text = request.form.get("note_text", "").strip()
+        note_color = request.form.get("note_color", "black").strip()
+
+        valid_colors = {"black", "blue", "red"}
+        if note_color not in valid_colors:
+            note_color = "black"
+
+        if note is None:
+            note = MaterialNote(
+                user_id=current_user.id,
+                material_id=material.id,
+                note_text=note_text,
+                note_color=note_color
+            )
+            db.session.add(note)
+        else:
+            note.note_text = note_text
+            note.note_color = note_color
+
+        db.session.commit()
+
+        flash("Study note saved successfully.", "success")
+        return redirect(url_for("main.material_notes", material_id=material.id))
+
+    return render_template(
+        "material_notes.html",
+        material=material,
+        note=note
+    )
 
 @main.route("/attempt/<int:attempt_id>")
 @login_required

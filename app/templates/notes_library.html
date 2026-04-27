@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Study Notes - TAPA{% endblock %}
+
+{% block content %}
+<div class="notes-library-page">
+
+    <div class="notes-library-hero">
+        <div>
+            <div class="eyebrow">Study Notes</div>
+            <h2>Your material note library</h2>
+            <p>
+                Choose a material and write study notes based on your generated quizzes, explanations, and revision progress.
+            </p>
+        </div>
+
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
+            Dashboard
+        </a>
+    </div>
+
+    {% if materials %}
+        <div class="notes-book-grid">
+            {% for material in materials %}
+                {% set note = note_map.get(material.id) %}
+
+                <a href="{{ url_for('main.material_notes', material_id=material.id) }}"
+                   class="notes-book-card {% if material.is_pinned %}is-pinned{% endif %}">
+                    <div class="notes-book-spine"></div>
+
+                    <div class="notes-book-content">
+                        <span class="material-course-pill">
+                            {{ material.course_code or 'No Course' }}
+                        </span>
+
+                        <h3>{{ material.title }}</h3>
+
+                        <p>{{ material.filename }}</p>
+
+                        <div class="notes-book-footer">
+                            {% if note and note.note_text %}
+                                <span class="note-status has-note">Note saved</span>
+                            {% else %}
+                                <span class="note-status no-note">No note yet</span>
+                            {% endif %}
+
+                            {% if material.is_pinned %}
+                                <span class="note-pin">★</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="dashboard-empty-card">
+            <div class="dashboard-empty-icon">📒</div>
+            <h3>No materials yet</h3>
+            <p>Upload a material first before creating study notes.</p>
+            <a href="{{ url_for('main.upload') }}" class="btn btn-primary">
+                Upload Material
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

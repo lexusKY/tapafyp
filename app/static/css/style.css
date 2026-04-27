@@ -5434,3 +5434,521 @@ button.review-action-card {
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
+
+/* ============================================================
+   Study Notes Library + Material Notes
+   ============================================================ */
+
+.notes-library-page,
+.material-notes-page {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.notes-library-hero,
+.material-notes-hero {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding: 34px;
+    margin-bottom: 20px;
+    border-radius: var(--r-2xl);
+    background: var(--grad-banner);
+    box-shadow: var(--shadow-hover);
+}
+
+.notes-library-hero::before,
+.material-notes-hero::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -70px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.notes-library-hero > *,
+.material-notes-hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+.notes-library-hero .eyebrow,
+.notes-library-hero h2,
+.notes-library-hero p,
+.material-notes-hero .eyebrow,
+.material-notes-hero h2,
+.material-notes-hero p {
+    color: #ffffff;
+}
+
+.notes-library-hero .eyebrow,
+.material-notes-hero .eyebrow {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.notes-library-hero p,
+.material-notes-hero p {
+    max-width: 720px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.notes-library-hero .btn-primary,
+.material-notes-hero .btn-primary {
+    background: #ffffff;
+    color: var(--v-600);
+    box-shadow: none;
+}
+
+.material-notes-hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.material-notes-hero-actions .btn-outline-primary {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+.material-notes-hero-actions .btn-outline-primary:hover {
+    background: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+.notes-book-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.notes-book-card {
+    position: relative;
+    min-height: 240px;
+    display: flex;
+    overflow: hidden;
+    border-radius: var(--r-xl);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-card);
+    color: inherit;
+    transition: transform 180ms var(--ease), box-shadow 180ms var(--ease), border-color 180ms var(--ease);
+}
+
+.notes-book-card:hover {
+    transform: translateY(-4px) rotate(-0.4deg);
+    border-color: var(--border-md);
+    box-shadow: var(--shadow-hover);
+    color: inherit;
+}
+
+.notes-book-card.is-pinned {
+    border-color: rgba(255, 186, 0, 0.42);
+}
+
+.notes-book-spine {
+    width: 16px;
+    flex: 0 0 auto;
+    background: var(--grad-primary);
+}
+
+.notes-book-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.notes-book-content h3 {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.notes-book-content p {
+    color: var(--ink-500);
+    font-size: 0.82rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.notes-book-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.note-status {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: var(--r-pill);
+    font-size: 0.7rem;
+    font-weight: 900;
+}
+
+.note-status.has-note {
+    background: var(--m-50);
+    color: var(--m-700);
+}
+
+.note-status.no-note {
+    background: var(--v-100);
+    color: var(--v-700);
+}
+
+.note-pin {
+    color: var(--a-600);
+    font-size: 1.1rem;
+}
+
+.material-notes-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.notes-section-card {
+    margin-bottom: 20px;
+}
+
+.notes-reference-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.notes-reference-meta div {
+    padding: 13px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+
+.notes-reference-meta span {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ink-500);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.notes-reference-meta strong {
+    color: var(--ink-900);
+    overflow-wrap: anywhere;
+}
+
+.notes-reference-actions {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.notes-reference-preview h6 {
+    margin-bottom: 8px;
+}
+
+.notes-reference-preview pre {
+    max-height: 520px;
+    overflow: auto;
+    padding: 14px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    white-space: pre-wrap;
+}
+
+.note-color-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.note-color-picker label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: var(--ink-700);
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.note-color-picker input {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+    accent-color: var(--v-500);
+}
+
+.note-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.note-color-dot.black {
+    background: var(--ink-900);
+}
+
+.note-color-dot.blue {
+    background: #2563eb;
+}
+
+.note-color-dot.red {
+    background: #dc2626;
+}
+
+.material-note-textarea {
+    min-height: 520px;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.note-color-black {
+    color: var(--ink-900);
+}
+
+.note-color-blue {
+    color: #2563eb;
+}
+
+.note-color-red {
+    color: #dc2626;
+}
+
+.material-note-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+@media (max-width: 980px) {
+    .notes-book-grid,
+    .material-notes-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .notes-library-hero,
+    .material-notes-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .material-notes-hero-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 560px) {
+    .notes-library-hero,
+    .material-notes-hero {
+        padding: 24px;
+    }
+
+    .material-note-actions .btn {
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   Rich Text Material Notes
+   ============================================================ */
+
+.rich-note-toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.rich-color-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: auto;
+    padding: 8px 12px;
+    border-radius: var(--r-pill);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: var(--ink-700);
+    font-size: 0.8rem;
+    font-weight: 800;
+    box-shadow: none;
+}
+
+.rich-color-btn:hover,
+.rich-color-btn.active {
+    background: var(--v-50);
+    border-color: var(--border-md);
+    color: var(--v-700);
+}
+
+.rich-note-editor {
+    width: 100%;
+    min-height: 520px;
+    padding: 16px;
+    border-radius: var(--r-lg);
+    border: 1.5px solid var(--border-md);
+    background: #ffffff;
+    color: var(--ink-900);
+    font-size: 1rem;
+    line-height: 1.8;
+    outline: none;
+    overflow-y: auto;
+}
+
+.rich-note-editor:focus {
+    border-color: var(--v-400);
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.12);
+}
+
+.rich-note-editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--ink-300);
+}
+
+/* ============================================================
+   Notes Page Question Reference Upgrade
+   ============================================================ */
+
+.notes-question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.notes-question-header p {
+    font-size: 0.82rem;
+}
+
+.notes-question-list {
+    display: grid;
+    gap: 14px;
+    max-height: 760px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.notes-question-card {
+    padding: 16px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+}
+
+.notes-question-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.notes-question-card h6 {
+    margin-bottom: 14px;
+    color: var(--ink-900);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.notes-answer-box,
+.notes-explanation-box {
+    padding: 12px 13px;
+    border-radius: var(--r-lg);
+    margin-top: 10px;
+}
+
+.notes-answer-box {
+    background: var(--m-50);
+    border-left: 4px solid var(--m-400);
+}
+
+.notes-explanation-box {
+    background: var(--v-50);
+    border-left: 4px solid var(--v-400);
+}
+
+.notes-answer-box strong,
+.notes-explanation-box strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--ink-900);
+    font-size: 0.78rem;
+}
+
+.notes-answer-box p,
+.notes-explanation-box p {
+    margin: 0;
+    color: var(--ink-600);
+    font-size: 0.82rem;
+    line-height: 1.55;
+}
+
+.sticky-note-editor-card {
+    position: sticky;
+    top: 96px;
+}
+
+/* ============================================================
+   Code Block Readability Fix for Notes / Question Reference
+   ============================================================ */
+
+.notes-question-card .tapa-code-block {
+    max-width: 100%;
+    margin: 12px 0;
+    border-radius: 14px;
+}
+
+.notes-question-card .tapa-code-header {
+    padding: 8px 12px;
+}
+
+.notes-question-card .tapa-code-header span {
+    font-size: 0.68rem;
+}
+
+.notes-question-card .tapa-code-block pre {
+    max-width: 100%;
+    padding: 12px;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    font-size: 0.72rem;
+    line-height: 1.55;
+}
+
+.notes-question-card .tapa-code-block code {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Also prevent long question text from pushing outside the note card */
+.notes-question-card,
+.notes-question-card h6,
+.notes-question-card p {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
