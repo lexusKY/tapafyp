@@ -114,7 +114,7 @@ def dashboard():
     materials = (
         Material.query
         .filter_by(user_id=current_user.id)
-        .order_by(Material.id.desc())
+        .order_by(Material.is_pinned.desc(), Material.id.desc())
         .all()
     )
 
@@ -1048,6 +1048,22 @@ def attempt_detail(attempt_id):
         attempt=attempt,
         answers=answers
     )
+
+@main.route("/material/<int:material_id>/toggle-pin", methods=["POST"])
+@login_required
+def toggle_pin_material(material_id):
+    material = get_user_material_or_404(material_id)
+
+    material.is_pinned = not material.is_pinned
+    db.session.commit()
+
+    if material.is_pinned:
+        flash("Material pinned to your dashboard.", "success")
+    else:
+        flash("Material unpinned from your dashboard.", "success")
+
+    next_url = request.form.get("next") or url_for("main.dashboard")
+    return redirect(next_url)
 
 @main.route("/material/<int:material_id>/delete", methods=["POST"])
 @login_required

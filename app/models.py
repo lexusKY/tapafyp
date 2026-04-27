@@ -54,6 +54,9 @@ class Material(db.Model):
     title = db.Column(db.String(200), nullable=False)
     filename = db.Column(db.String(255), nullable=False)
 
+    # Favourite / pinned material
+    is_pinned = db.Column(db.Boolean, nullable=False, default=False)
+
     # Extraction text
     extracted_text = db.Column(db.Text, nullable=True)
 
