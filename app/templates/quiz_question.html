@@ -16,8 +16,14 @@
                 <p>{{ level }} Level</p>
             </div>
 
-            <div class="quiz-counter">
-                {{ question_number }}/{{ total_questions }}
+            <div class="quiz-top-right-tools">
+                <div class="quiz-live-timer" id="quizLiveTimer">
+                    Time Used: 0s
+                </div>
+
+                <div class="quiz-count-pill">
+                    {{ question_number }}/{{ total_questions }}
+                </div>
             </div>
         </div>
 
@@ -102,6 +108,32 @@
             const width = bar.getAttribute("data-width") || "0";
             bar.style.width = width + "%";
         });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const timer = document.getElementById("quizLiveTimer");
+        if (!timer) return;
+
+        let seconds = parseInt(sessionStorage.getItem("tapaQuizTimerSeconds") || "0", 10);
+
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const remainingSeconds = totalSeconds % 60;
+
+            if (minutes <= 0) {
+                return remainingSeconds + "s";
+            }
+
+            return minutes + "m " + remainingSeconds + "s";
+        }
+
+        timer.textContent = "Time Used: " + formatTime(seconds);
+
+        setInterval(function () {
+            seconds += 1;
+            sessionStorage.setItem("tapaQuizTimerSeconds", seconds.toString());
+            timer.textContent = "Time Used: " + formatTime(seconds);
+        }, 1000);
     });
 </script>
 {% endblock %}

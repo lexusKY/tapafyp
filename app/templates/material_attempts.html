@@ -70,6 +70,7 @@
                                 <th>Type</th>
                                 <th>Score</th>
                                 <th>Percentage</th>
+                                <th>Time Used</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -113,6 +114,10 @@
                                         <div class="text-muted small mt-1">
                                             {{ percentage }}%
                                         </div>
+                                    </td>
+
+                                    <td>
+                                        <strong>{{ format_duration(attempt.duration_seconds) }}</strong>
                                     </td>
 
                                     <td class="text-end">

@@ -195,6 +195,8 @@ class QuizAttempt(db.Model):
     total_questions = db.Column(db.Integer, nullable=False)
 
     attempt_type = db.Column(db.String(20), nullable=False, default="normal")
+    duration_seconds = db.Column(db.Integer, nullable=True)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     answers = db.relationship(

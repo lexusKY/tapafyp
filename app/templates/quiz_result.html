@@ -24,6 +24,12 @@
             {{ percentage }}%
         </div>
 
+        {% if duration_text %}
+            <div class="result-duration-pill">
+                Time Used: {{ duration_text }}
+            </div>
+        {% endif %}
+
         <div class="result-actions">
             {% if retry_available %}
                 <a class="btn btn-primary" href="{{ url_for('main.retry_wrong', material_id=material.id, level=level) }}">
@@ -45,6 +51,7 @@
                 Back to Dashboard
             </a>
         </div>
+    </div>
 
     <div class="result-section-header">
         <div>
@@ -111,5 +118,9 @@
             bar.style.width = width + "%";
         });
     });
+</script>
+
+<script>
+    sessionStorage.removeItem("tapaQuizTimerSeconds");
 </script>
 {% endblock %}

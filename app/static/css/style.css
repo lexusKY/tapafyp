@@ -5952,3 +5952,209 @@ button.review-action-card {
     overflow-wrap: anywhere;
     word-break: break-word;
 }
+
+/* ============================================================
+   Quiz Duration Display
+   ============================================================ */
+
+.result-duration-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 8px 14px;
+    border-radius: var(--r-pill);
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    font-size: 0.86rem;
+    font-weight: 900;
+}
+
+.history-score-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+    .history-score-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .history-score-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.quiz-live-timer {
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 8px;
+    padding: 7px 12px;
+    border-radius: var(--r-pill);
+    background: var(--v-100);
+    color: var(--v-700);
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+.result-duration-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 8px 14px;
+    border-radius: var(--r-pill);
+    background: var(--v-100);
+    color: var(--v-700);
+    border: 1px solid var(--border-md);
+    font-size: 0.86rem;
+    font-weight: 900;
+}
+
+/* ============================================================
+   Quiz Timer Position Polish
+   ============================================================ */
+
+/* Move live timer closer to the right-side question counter */
+.quiz-card,
+.quiz-question-card {
+    position: relative;
+}
+
+.quiz-live-timer {
+    position: absolute;
+    top: 46px;
+    right: 124px;
+    margin-top: 0;
+    z-index: 2;
+}
+
+/* Keep it responsive on smaller screens */
+@media (max-width: 900px) {
+    .quiz-live-timer {
+        position: static;
+        margin-top: 10px;
+        margin-bottom: 6px;
+    }
+}
+
+/* Result page time spacing */
+.result-duration-pill {
+    margin-top: 22px;
+    margin-bottom: 4px;
+}
+
+/* If result actions are too close, add slightly more gap */
+.result-actions {
+    margin-top: 18px;
+}
+
+/* ============================================================
+   Quiz Timer Alignment - Smaller Version
+   ============================================================ */
+
+.quiz-live-timer {
+    top: 42px !important;
+    right: 118px !important;
+    min-height: 48px;
+    padding: 0 15px;
+    border-radius: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--v-100);
+    color: var(--v-700);
+    font-size: 0.88rem;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+/* On smaller screens, let it return to normal flow */
+@media (max-width: 900px) {
+    .quiz-live-timer {
+        position: static !important;
+        min-height: auto;
+        padding: 8px 12px;
+        border-radius: var(--r-pill);
+        margin-top: 10px;
+        margin-bottom: 6px;
+        font-size: 0.82rem;
+    }
+}
+
+/* ============================================================
+   Quiz Timer + Counter Alignment Without Extra Page Spacing
+   ============================================================ */
+
+.quiz-card .quiz-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 16px;
+}
+
+.quiz-card .quiz-top > div:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.quiz-top-right-tools {
+    position: static !important;
+    flex: 0 0 auto;
+    display: flex !important;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.quiz-top-right-tools .quiz-live-timer,
+.quiz-top-right-tools .quiz-count-pill {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 46px;
+    height: 46px;
+    margin: 0 !important;
+    padding: 0 16px;
+    border-radius: 23px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: var(--v-100);
+    color: var(--v-700);
+    font-size: 0.9rem;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.quiz-top-right-tools .quiz-count-pill {
+    min-width: 66px !important;
+    font-size: 1rem;
+}
+
+@media (max-width: 760px) {
+    .quiz-card .quiz-top {
+        flex-direction: column;
+    }
+
+    .quiz-top-right-tools {
+        justify-content: flex-start;
+    }
+
+    .quiz-top-right-tools .quiz-live-timer,
+    .quiz-top-right-tools .quiz-count-pill {
+        height: auto;
+        min-height: auto;
+        padding: 8px 12px;
+        border-radius: var(--r-pill);
+        font-size: 0.82rem;
+    }
+}

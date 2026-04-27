@@ -61,6 +61,11 @@
                             <span>Level</span>
                             <strong>{{ attempt.level }}</strong>
                         </div>
+
+                        <div>
+                            <span>Time Used</span>
+                            <strong>{{ format_duration(attempt.duration_seconds) }}</strong>
+                        </div>
                     </div>
 
                     <div class="history-mini-progress">

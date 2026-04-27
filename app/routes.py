@@ -1,4 +1,5 @@
 import os
+import time
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, session, Response
 from flask_login import login_required, current_user
@@ -75,15 +76,36 @@ def safe_question_count(value):
 
     return count
 
+def format_duration(seconds):
+    if seconds is None:
+        return "-"
 
-def save_quiz_attempt(material, level, score, total_questions, results, attempt_type="normal"):
+    try:
+        seconds = int(seconds)
+    except (TypeError, ValueError):
+        return "-"
+
+    if seconds < 0:
+        return "-"
+
+    minutes = seconds // 60
+    remaining_seconds = seconds % 60
+
+    if minutes == 0:
+        return f"{remaining_seconds}s"
+
+    return f"{minutes}m {remaining_seconds}s"
+
+
+def save_quiz_attempt(material, level, score, total_questions, results, attempt_type="normal", duration_seconds=None):
     attempt = QuizAttempt(
         user_id=current_user.id,
         material_id=material.id,
         level=level,
         score=score,
         total_questions=total_questions,
-        attempt_type=attempt_type
+        attempt_type=attempt_type,
+        duration_seconds=duration_seconds
     )
 
     db.session.add(attempt)
@@ -624,6 +646,7 @@ def start_quiz(material_id, level):
         return redirect(url_for("main.choose_level", material_id=material.id))
 
     session[f"quiz_{material_id}_{level}_answers"] = {}
+    session[f"quiz_{material_id}_{level}_started_at"] = int(time.time())
     session.pop(f"retry_{material_id}_{level}_question_ids", None)
     session.pop(f"retry_{material_id}_{level}_answers", None)
 
@@ -771,14 +794,24 @@ def quiz_result(material_id, level):
 
     session[f"retry_{material_id}_{level}_question_ids"] = wrong_question_ids
 
+    started_at_key = f"quiz_{material_id}_{level}_started_at"
+    started_at = session.get(started_at_key)
+
+    duration_seconds = None
+    if started_at:
+        duration_seconds = max(0, int(time.time()) - int(started_at))
+
     attempt = save_quiz_attempt(
         material=material,
         level=level,
         score=score,
         total_questions=total_questions,
         results=results,
-        attempt_type="normal"
+        attempt_type="normal",
+        duration_seconds=duration_seconds
     )
+
+    session.pop(started_at_key, None)
 
     return render_template(
         "quiz_result.html",
@@ -788,7 +821,8 @@ def quiz_result(material_id, level):
         results=results,
         level=level,
         retry_available=retry_available,
-        attempt=attempt
+        attempt=attempt,
+        duration_text=format_duration(duration_seconds)
     )
 
 
@@ -812,6 +846,7 @@ def retry_wrong(material_id, level):
         ))
 
     session[f"retry_{material_id}_{level}_answers"] = {}
+    session[f"retry_{material_id}_{level}_started_at"] = int(time.time())
 
     return redirect(url_for(
         "main.retry_question",
@@ -955,14 +990,24 @@ def retry_result(material_id, level):
 
     total_questions = len(questions)
 
+    started_at_key = f"retry_{material_id}_{level}_started_at"
+    started_at = session.get(started_at_key)
+
+    duration_seconds = None
+    if started_at:
+        duration_seconds = max(0, int(time.time()) - int(started_at))
+
     attempt = save_quiz_attempt(
         material=material,
         level=level,
         score=score,
         total_questions=total_questions,
         results=results,
-        attempt_type="retry"
+        attempt_type="retry",
+        duration_seconds=duration_seconds
     )
+
+    session.pop(started_at_key, None)
 
     return render_template(
         "quiz_result.html",
@@ -972,7 +1017,8 @@ def retry_result(material_id, level):
         results=results,
         level=f"{level} Retry",
         retry_available=False,
-        attempt=attempt
+        attempt=attempt,
+        duration_text=format_duration(duration_seconds)
     )
 
 
@@ -986,7 +1032,11 @@ def history():
         .all()
     )
 
-    return render_template("history.html", attempts=attempts)
+    return render_template(
+        "history.html",
+        attempts=attempts,
+        format_duration=format_duration
+    )
 
 @main.route("/material/<int:material_id>/attempts")
 @login_required
@@ -1022,7 +1072,8 @@ def material_attempts(material_id):
         total_attempts=total_attempts,
         best_attempt=best_attempt,
         normal_count=normal_count,
-        retry_count=retry_count
+        retry_count=retry_count,
+        format_duration=format_duration
     )
 
 @main.route("/notes")
@@ -1115,7 +1166,8 @@ def attempt_detail(attempt_id):
     return render_template(
         "attempt_detail.html",
         attempt=attempt,
-        answers=answers
+        answers=answers,
+        duration_text=format_duration(attempt.duration_seconds)
     )
 
 @main.route("/material/<int:material_id>/toggle-pin", methods=["POST"])
