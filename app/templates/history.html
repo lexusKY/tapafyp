@@ -3,91 +3,118 @@
 {% block title %}Quiz History - TAPA{% endblock %}
 
 {% block content %}
-<div class="history-page">
+<div class="history-page-modern">
 
-    <div class="page-header">
-        <h2>Quiz History</h2>
-        <p>View your previous quiz attempts and reopen saved results anytime.</p>
-    </div>
-
-    <div class="card">
-        <div class="card-header bg-white">
-            <h5 class="mb-0 fw-semibold">Previous Attempts</h5>
+    <div class="history-hero">
+        <div>
+            <div class="eyebrow">Quiz History</div>
+            <h2>Your saved quiz attempts</h2>
+            <p>
+                Review previous attempts, reopen saved results, and continue practising from your materials.
+            </p>
         </div>
 
-        <div class="card-body">
-            {% if attempts %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Material</th>
-                                <th>Course</th>
-                                <th>Level</th>
-                                <th>Score</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {% for attempt in attempts %}
-                                {% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ attempt.material.title }}</strong>
-                                    </td>
-
-                                    <td>
-                                        {{ attempt.material.course_code or '-' }}
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-light text-dark border">
-                                            {{ attempt.level }}
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>{{ attempt.score }}/{{ attempt.total_questions }}</strong>
-                                        <span class="text-muted">({{ percentage }}%)</span>
-                                    </td>
-
-                                    <td>
-                                        {% if attempt.attempt_type == "retry" %}
-                                            <span class="status-pill status-wrong">Retry</span>
-                                        {% else %}
-                                            <span class="status-pill status-correct">Normal</span>
-                                        {% endif %}
-                                    </td>
-
-                                    <td>
-                                        {{ attempt.created_at.strftime('%d %b %Y, %I:%M %p') }}
-                                    </td>
-
-                                    <td class="text-end">
-                                        <a href="{{ url_for('main.attempt_detail', attempt_id=attempt.id) }}"
-                                           class="btn btn-sm btn-primary">
-                                            View Result
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <h3>No quiz history yet</h3>
-                    <p>Complete a quiz first and your attempt will appear here.</p>
-                    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
-                        Go to Dashboard
-                    </a>
-                </div>
-            {% endif %}
-        </div>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
+            Back to Dashboard
+        </a>
     </div>
+
+    {% if attempts %}
+        <div class="history-card-grid">
+            {% for attempt in attempts %}
+                {% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
+
+                <div class="history-attempt-card">
+
+                    <div class="history-card-top">
+                        <div>
+                            <span class="history-course-pill">
+                                {{ attempt.material.course_code or 'No Course' }}
+                            </span>
+
+                            <h3>{{ attempt.material.title }}</h3>
+
+                            <p>
+                                {{ attempt.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                            </p>
+                        </div>
+
+                        {% if attempt.attempt_type == "retry" %}
+                            <span class="status-pill status-wrong">Retry</span>
+                        {% else %}
+                            <span class="status-pill status-correct">Normal</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="history-score-row">
+                        <div>
+                            <span>Score</span>
+                            <strong>{{ attempt.score }}/{{ attempt.total_questions }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Percentage</span>
+                            <strong>{{ percentage }}%</strong>
+                        </div>
+
+                        <div>
+                            <span>Level</span>
+                            <strong>{{ attempt.level }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="history-mini-progress">
+                        <div class="history-mini-progress-fill"
+                             data-width="{{ percentage }}">
+                        </div>
+                    </div>
+
+                    <div class="history-card-actions">
+                        <a href="{{ url_for('main.attempt_detail', attempt_id=attempt.id) }}"
+                           class="btn btn-primary">
+                            View Result
+                        </a>
+
+                        <a href="{{ url_for('main.material_attempts', material_id=attempt.material.id) }}"
+                           class="btn btn-outline-primary">
+                            Material Attempts
+                        </a>
+
+                        <form method="POST"
+                              action="{{ url_for('main.delete_attempt', attempt_id=attempt.id) }}"
+                              class="history-delete-form"
+                              onsubmit="return confirm('Delete this quiz attempt?');">
+                            <button type="submit"
+                                    class="history-delete-btn"
+                                    title="Delete Attempt"
+                                    aria-label="Delete Attempt">
+                                🗑
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="dashboard-empty-card">
+            <div class="dashboard-empty-icon">📝</div>
+            <h3>No quiz history yet</h3>
+            <p>Complete a quiz first and your saved attempt will appear here.</p>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
+                Go to Dashboard
+            </a>
+        </div>
+    {% endif %}
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".history-mini-progress-fill").forEach(function (bar) {
+            const width = bar.getAttribute("data-width") || "0";
+            bar.style.width = width + "%";
+        });
+    });
+</script>
 {% endblock %}

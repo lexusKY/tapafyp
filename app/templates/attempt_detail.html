@@ -5,57 +5,87 @@
 {% block content %}
 {% set percentage = (attempt.score / attempt.total_questions * 100) | round(0) if attempt.total_questions > 0 else 0 %}
 
-<div class="quiz-result-page">
+<div class="attempt-detail-page">
 
-    <div class="result-hero-card">
-        <div class="result-badge">Saved Attempt</div>
+    <div class="attempt-detail-hero">
+        <div class="attempt-detail-main">
+            <div class="result-badge">Saved Attempt</div>
 
-        <h2>{{ attempt.score }}/{{ attempt.total_questions }}</h2>
+            <h2>{{ attempt.score }}/{{ attempt.total_questions }}</h2>
 
-        <p>
-            <strong>{{ attempt.material.title }}</strong> · {{ attempt.level }} Level
-        </p>
+            <p>
+                <strong>{{ attempt.material.title }}</strong> ·
+                {{ attempt.material.course_code or 'No Course' }} ·
+                {{ attempt.level }} Level
+            </p>
 
-        <div class="result-progress">
-            <div class="result-progress-fill" data-width="{{ percentage }}"></div>
+            <div class="result-progress">
+                <div class="result-progress-fill" data-width="{{ percentage }}"></div>
+            </div>
+
+            <div class="result-percentage">
+                {{ percentage }}%
+            </div>
         </div>
 
-        <div class="result-percentage">
-            {{ percentage }}%
+        <div class="attempt-detail-summary">
+            <div>
+                <span>Attempt Type</span>
+                <strong>{{ attempt.attempt_type|capitalize }}</strong>
+            </div>
+
+            <div>
+                <span>Date</span>
+                <strong>{{ attempt.created_at.strftime('%d %b %Y') }}</strong>
+            </div>
+
+            <div>
+                <span>Time</span>
+                <strong>{{ attempt.created_at.strftime('%I:%M %p') }}</strong>
+            </div>
         </div>
+    </div>
 
-       <div class="result-actions">
-            <a class="btn btn-primary" href="{{ url_for('main.choose_level', material_id=attempt.material.id) }}">
-                Practise Again
-            </a>
+    <div class="attempt-detail-actions">
+        <a class="btn btn-primary"
+           href="{{ url_for('main.choose_level', material_id=attempt.material.id) }}">
+            Practise Again
+        </a>
 
-            <a class="btn btn-outline-primary" href="{{ url_for('main.history') }}">
-                Back to History
-            </a>
+        <a class="btn btn-outline-primary"
+           href="{{ url_for('main.material_attempts', material_id=attempt.material.id) }}">
+            Material Attempts
+        </a>
 
-            <form method="POST"
-                action="{{ url_for('main.delete_attempt', attempt_id=attempt.id) }}"
-                class="inline-delete-form"
-                onsubmit="return confirm('Delete this saved quiz attempt?');">
-                <button type="submit" class="btn btn-danger-outline">
-                    Delete Attempt
-                </button>
-            </form>
+        <a class="btn btn-outline-secondary"
+           href="{{ url_for('main.view_material', material_id=attempt.material.id) }}">
+            Material Workspace
+        </a>
 
-            <a class="btn btn-outline-secondary" href="{{ url_for('main.dashboard') }}">
-                Dashboard
-            </a>
-        </div>
+        <form method="POST"
+              action="{{ url_for('main.delete_attempt', attempt_id=attempt.id) }}"
+              class="attempt-detail-delete-form"
+              onsubmit="return confirm('Delete this saved quiz attempt?');">
+            <button type="submit"
+                    class="attempt-detail-delete-btn"
+                    title="Delete Attempt"
+                    aria-label="Delete Attempt">
+                🗑
+            </button>
+        </form>
     </div>
 
     <div class="result-section-header">
         <div>
             <h3>Saved Answer Review</h3>
             <p>
-                Attempt type: {{ attempt.attempt_type|capitalize }} ·
-                {{ attempt.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                Review your selected answers, correct answers, and explanations for this attempt.
             </p>
         </div>
+
+        <a href="{{ url_for('main.history') }}" class="btn btn-sm btn-outline-primary">
+            Global History
+        </a>
     </div>
 
     <div class="result-list">
