@@ -1,8 +1,8 @@
 # TAPA - Tool for Automated Personalised Assessment
 
-TAPA is an AI-powered student revision web application that converts uploaded lecture materials into interactive quiz practice. The system allows students to upload learning materials, review and clean extracted text, generate multiple-choice questions, attempt quizzes by difficulty level, save quiz history, and write personal study notes.
+TAPA is an AI-powered student revision web application developed as a Final Year Project prototype. The system helps students convert their uploaded lecture materials into reviewed learning content, generated multiple-choice questions, quiz attempts, saved history, and personal study notes.
 
-This project was developed as a Final Year Project system prototype.
+The main goal of TAPA is to support active revision. Instead of only re-reading notes, students can upload their own materials, review the extracted text, generate MCQs, attempt quizzes by difficulty level, and write notes based on generated questions and explanations.
 
 ---
 
@@ -11,82 +11,92 @@ This project was developed as a Final Year Project system prototype.
 ### User Account and Profile
 
 - User registration, login, and logout
-- Student profile setup
 - Profile-first onboarding flow
+- Student profile setup before using the main system
 - Change password feature for logged-in users
+- User-owned materials, quiz attempts, and notes
 
 ### Material Upload and Review
 
-- Upload up to 3 files for one revision set
-- Supported formats: PDF, DOCX, PPTX, and HTML
+- Upload up to 3 files for one revision material
+- Supported file formats:
+  - PDF
+  - DOCX
+  - PPTX
+  - HTML
 - Extract text from uploaded files
 - Review extracted text before quiz generation
-- AI clean text function for messy extracted notes
+- AI Clean Text function to improve messy extracted content
+- Upload disclaimer to remind users to upload only appropriate learning materials
 
 ### AI Quiz Generation
 
-- Generate multiple-choice questions from reviewed lecture content
+- Generate MCQs from reviewed lecture content
 - Uses Gemini API for AI-powered text cleaning and MCQ generation
-- Supports quiz preferences:
+- Quiz preference options:
   - Number of questions
-  - Difficulty
+  - Difficulty level
   - Question style
   - Quiz focus
-- Difficulty levels:
+- Supported difficulty levels:
   - Hot
   - Moderate
   - Cold
   - All / Mixed Difficulty
-- Regenerate confirmation page to prevent accidental replacement of generated questions
+- Regenerate confirmation page to avoid accidental replacement of generated questions
 
 ### Quiz Practice
 
 - Interactive quiz answering flow
-- Immediate answer checking
+- One-question-at-a-time quiz interface
+- Answer checking before continuing
 - Correct answer and explanation display
-- Quiz progress indicator
-- Time used tracking
-- Retry wrong questions
+- Live quiz timer display
+- Quiz duration tracking saved with attempts
+- Retry wrong questions feature
 
-### Quiz History and Review
+### History and Review
 
 - Global quiz history page
-- Material-specific attempt history
-- Saved result detail page
-- Score, percentage, level, attempt type, date, and time used
-- Question bank page
-- Question bank export to text file
+- Material-specific attempt history page
+- Attempt detail page showing selected answer, correct answer, and explanation
+- Saved result records with score, percentage, level, attempt type, date, and time used
+- Question bank page for generated questions
+- Question bank export as text file
 
 ### Study Notes
 
-- Notes library for uploaded materials
-- Material-specific study notes page
+- Notes Library for uploaded materials
+- Material-specific notes page
 - Generated questions and explanations shown beside the notes editor
-- Rich text note editor with text colour options:
+- Rich text note editor with text color options:
   - Black
   - Blue
   - Red
+- Notes are linked to the user's own material
 
 ### Material Management
 
-- Dashboard with uploaded materials
-- Pin / favourite materials
-- View material workspace
-- Delete materials and related data
+- Dashboard showing uploaded materials
+- Pin / favourite material feature
+- Material workspace page
+- Delete material with related data
 - Delete quiz attempts
 
 ### Onboarding and UI Support
 
 - Getting Started checklist for first-time users
-- Completion congratulations card after the full learning flow is completed
+- Current-step highlight to guide new users
+- Completion congratulations card after the first full TAPA learning flow
 - Loading overlay for AI actions
-- Admin-only Course Style page access
+- Cleaner interface for material workspace, quiz attempts, notes, login, and register pages
 
 ### Admin Course Style Tool
 
-- Admin-only access
-- Course Style tool can analyse past paper folders and generate a style profile
-- Normal users cannot access the Course Style page directly
+- Admin-only Course Style access
+- Course Style page is hidden from normal users
+- Direct access to Course Style is blocked for non-admin users
+- Admin can generate a course style profile from reference past papers
 
 ---
 
@@ -109,7 +119,8 @@ This project was developed as a Final Year Project system prototype.
 
 ### AI Service
 
-- Google Gemini API using `google-genai`
+- Google Gemini API
+- `google-genai` Python package
 
 ### File Processing
 
@@ -148,10 +159,14 @@ tapafyp/
 │   │   ├── components/
 │   │   │   └── onboarding_checklist.html
 │   │   ├── base.html
+│   │   ├── index.html
+│   │   ├── login.html
+│   │   ├── register.html
 │   │   ├── dashboard.html
 │   │   ├── upload.html
 │   │   ├── material_review.html
 │   │   ├── material_detail.html
+│   │   ├── question_bank.html
 │   │   ├── choose_level.html
 │   │   ├── quiz_question.html
 │   │   ├── quiz_result.html
@@ -161,8 +176,6 @@ tapafyp/
 │   │   ├── notes_library.html
 │   │   ├── material_notes.html
 │   │   ├── profile.html
-│   │   ├── login.html
-│   │   ├── register.html
 │   │   └── course_style.html
 │   │
 │   ├── __init__.py
@@ -196,8 +209,9 @@ GEMINI_API_KEY=replace-with-your-gemini-api-key
 Important:
 
 ```text
-Do not commit your real .env file.
-Do not expose your Gemini API key.
+Do not commit the real .env file.
+Do not expose the Gemini API key.
+Only commit .env.example.
 ```
 
 ---
@@ -225,19 +239,13 @@ For Windows:
 venv\Scripts\activate
 ```
 
-For macOS/Linux:
-
-```bash
-source venv/bin/activate
-```
-
 ### Step 3: Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Step 4: Set Up the Database
+### Step 4: Create the Database
 
 Start WAMPServer and make sure MySQL/MariaDB is running.
 
@@ -247,7 +255,9 @@ Create a database named:
 tapa_db
 ```
 
-Then create a `.env` file using `.env.example`.
+### Step 5: Configure `.env`
+
+Create a `.env` file in the project root.
 
 Example:
 
@@ -257,26 +267,32 @@ DATABASE_URL=mysql+pymysql://root:@localhost:3306/tapa_db
 GEMINI_API_KEY=replace-with-your-gemini-api-key
 ```
 
-### Step 5: Run Database Migrations
+If `localhost` does not work, try:
+
+```env
+DATABASE_URL=mysql+pymysql://root:@127.0.0.1:3306/tapa_db
+```
+
+### Step 6: Run Database Migrations
 
 ```bash
 flask db upgrade
 ```
 
-If migrations need to be created during development:
+During development, if a new migration is needed:
 
 ```bash
 flask db migrate -m "migration message"
 flask db upgrade
 ```
 
-### Step 6: Run the Application
+### Step 7: Run the Application
 
 ```bash
 python run.py
 ```
 
-Open the system in a browser:
+Open the application in a browser:
 
 ```text
 http://127.0.0.1:5000
@@ -288,9 +304,7 @@ http://127.0.0.1:5000
 
 The Course Style page is restricted to admin users only.
 
-By default, new users are normal users.
-
-To make an account admin, update the `users` table in the database:
+By default, users are normal users. To make an account an admin, update the `users` table in the database:
 
 ```text
 is_admin = 1
@@ -308,11 +322,44 @@ Admin users can access:
 /course-style
 ```
 
-Normal users will be redirected away if they try to access it directly.
+Normal users cannot see the Course Style link and will be redirected if they try to access the page directly.
 
 ---
 
-## 7. Recommended User Flow
+## 7. Course Style Folder Structure
+
+Course style profiles are stored under the `past_papers` folder.
+
+Example structure:
+
+```text
+past_papers/
+└── UECS3253/
+    ├── archive/
+    ├── main_reference/
+    │   ├── past_paper_2023.pdf
+    │   └── past_paper_2024.pdf
+    ├── support_reference/
+    └── style_profile.txt
+```
+
+The Course Style tool reads PDF files from:
+
+```text
+past_papers/<COURSE_CODE>/main_reference/
+```
+
+and generates:
+
+```text
+past_papers/<COURSE_CODE>/style_profile.txt
+```
+
+The style profile helps TAPA generate questions that better follow the expected course style. However, it is not a full course-authenticity verification system.
+
+---
+
+## 8. Recommended User Flow
 
 ```text
 Register
@@ -330,47 +377,104 @@ Register
 → Review History / Notes Later
 ```
 
+The first-time user flow is supported by the Getting Started checklist.
+
 ---
 
-## 8. Notes About AI Generation
+## 9. AI Generation Notes
 
-TAPA uses AI to assist with:
+TAPA uses Gemini API to assist with:
 
 - Cleaning extracted lecture text
-- Generating multiple-choice questions
-- Creating hints and explanations
+- Generating MCQs
+- Generating hints and explanations
 - Assigning difficulty levels
+- Creating course style profiles for admin use
 
-The quality of generated questions depends on:
+Generated question quality depends on:
 
-- Quality of extracted text
-- Clarity of uploaded materials
+- Quality of uploaded files
+- Accuracy of extracted text
 - User-reviewed cleaned text
-- Quiz focus and preference settings
+- Quiz focus settings
+- Availability and quality of course style profiles
 
 Users are encouraged to review extracted text before generating quizzes.
 
 ---
 
-## 9. Security Notes
+## 10. Security and Safety Notes
 
-- Passwords are stored as hashed values.
-- Users must log in before accessing materials, quizzes, notes, or history.
-- Users can only access their own uploaded materials and quiz attempts.
-- Course Style tools are restricted to admin users.
-- The real `.env` file should not be committed to GitHub.
+TAPA includes several prototype-level safeguards:
+
+- Users must log in before accessing materials, quizzes, notes, and history
+- Users can only access their own uploaded materials
+- Users can only access their own quiz attempts
+- Course Style is restricted to admin users
+- Uploaded filenames are processed using secure filename handling
+- File upload size is limited through Flask configuration
+- Users are reminded not to upload private, sensitive, inappropriate, illegal, or unrelated content
+- AI prompts include instructions to treat uploaded text as content, not as commands
+- Regenerate confirmation prevents accidental replacement of generated questions
+- Passwords are stored as hashed values
+
+Important:
+
+```text
+The real .env file must not be committed.
+The Gemini API key must not be exposed publicly.
+```
 
 ---
 
-## 10. Future Enhancements
+## 11. Known Limitations
+
+TAPA is a Final Year Project prototype, not a production deployment. Some limitations remain:
+
+- The system cannot perfectly verify whether uploaded content truly belongs to the selected course
+- A user may still upload unrelated content under a valid course code
+- Course Style helps guide generation style, but it does not fully authenticate uploaded materials
+- AI-generated questions may still require user review
+- There is no production-level rate limiting for Gemini API usage
+- There is no email-based password reset
+- Rich text notes use basic sanitisation only and may need stronger production-grade HTML sanitisation
+- Content safety and course relevance checking can be improved further
+
+These limitations are acceptable for a prototype but should be addressed before production use.
+
+---
+
+## 12. Future Enhancements
 
 Possible future improvements include:
 
-- Real email-based password reset
-- More advanced note editor tools
-- Drawing or sketching tools for study notes
-- More detailed quiz analytics
+- AI-based course relevance classification
+- Similarity comparison against lecturer-approved course materials
+- Automatic course keyword generation
+- Admin dashboard for monitoring usage
+- Daily AI generation quota per user
+- Email-based forgot password flow
+- More advanced study notes editor
+- Drawing or sketching tools for notes
 - Export notes to PDF
-- More file type support
-- Deployment to a cloud hosting platform
-- Advanced admin dashboard
+- More detailed quiz analytics
+- Cloud deployment
+- Stronger content moderation and file validation
+
+---
+
+## 13. Final Project Summary
+
+TAPA provides a complete AI-supported revision workflow:
+
+```text
+Upload material
+→ Review extracted text
+→ Generate quiz
+→ Attempt quiz
+→ Review result
+→ Save study notes
+→ Track learning history
+```
+
+The system is designed for student-centred revision and demonstrates the use of AI to support active learning through personalised quiz generation and learning reflection.
