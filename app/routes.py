@@ -1,5 +1,7 @@
 import os
 import time
+import re
+from markupsafe import Markup
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, session, Response
@@ -15,6 +17,8 @@ main = Blueprint("main", __name__)
 
 ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "html"}
 VALID_DIFFICULTIES = {"Hot", "Moderate", "Cold", "All"}
+
+MAX_AI_TEXT_LENGTH = 30000
 
 
 def allowed_file(filename):
@@ -120,6 +124,173 @@ def require_complete_profile():
         return redirect(url_for("main.profile"))
 
     return None
+
+def course_exists(course_code):
+    if not course_code:
+        return False
+
+    course_path = os.path.join(
+        current_app.config["PAST_PAPERS_FOLDER"],
+        course_code.upper()
+    )
+
+    return os.path.isdir(course_path)
+
+def validate_learning_content(text):
+    text = (text or "").strip()
+    lower_text = text.lower()
+
+    if len(text) < 80:
+        return False, "The uploaded file does not contain enough learning content."
+
+    blocked_terms = [
+        "nsfw",
+        "rule34",
+        "porn",
+        "naked",
+        "sex",
+        "fuck",
+        "illegal drug",
+        "how to hack",
+        "how to steal",
+        "kill yourself",
+        "self harm"
+    ]
+
+    for term in blocked_terms:
+        if term in lower_text:
+            return False, (
+                "This file appears to contain unsafe, inappropriate, or non-educational content. "
+                "Please upload valid lecture or study material only."
+            )
+
+    learning_signals = [
+        "chapter",
+        "topic",
+        "lecture",
+        "learning outcome",
+        "objective",
+        "definition",
+        "example",
+        "formula",
+        "theory",
+        "concept",
+        "algorithm",
+        "method",
+        "question",
+        "answer",
+        "summary",
+        "introduction",
+        "reference",
+        "tutorial",
+        "exercise"
+    ]
+
+    signal_count = sum(1 for signal in learning_signals if signal in lower_text)
+
+    if signal_count == 0:
+        return False, (
+            "This file does not look like lecture or study material. "
+            "Please upload educational notes, slides, tutorials, or revision content."
+        )
+
+    return True, ""
+
+def sanitize_note_html(note_html):
+    if not note_html:
+        return ""
+
+    allowed_tags = {
+        "br", "div", "p", "span", "strong", "b", "em", "i", "u",
+        "ul", "ol", "li"
+    }
+
+    allowed_style_properties = {"color"}
+
+    # Remove dangerous blocks completely.
+    note_html = re.sub(
+        r"<\s*(script|iframe|object|embed|style|link|meta|form|input|button)[^>]*>.*?<\s*/\s*\1\s*>",
+        "",
+        note_html,
+        flags=re.IGNORECASE | re.DOTALL
+    )
+
+    # Remove self-closing or opening dangerous tags.
+    note_html = re.sub(
+        r"<\s*/?\s*(script|iframe|object|embed|style|link|meta|form|input|button)[^>]*>",
+        "",
+        note_html,
+        flags=re.IGNORECASE
+    )
+
+    # Remove inline event handlers like onclick, onerror, onload.
+    note_html = re.sub(
+        r"\s+on[a-zA-Z]+\s*=\s*(['\"]).*?\1",
+        "",
+        note_html,
+        flags=re.IGNORECASE | re.DOTALL
+    )
+
+    note_html = re.sub(
+        r"\s+on[a-zA-Z]+\s*=\s*[^\s>]+",
+        "",
+        note_html,
+        flags=re.IGNORECASE
+    )
+
+    # Remove javascript: URLs.
+    note_html = re.sub(
+        r"javascript\s*:",
+        "",
+        note_html,
+        flags=re.IGNORECASE
+    )
+
+    def clean_tag(match):
+        slash = match.group(1)
+        tag = match.group(2).lower()
+        attrs = match.group(3) or ""
+
+        if tag not in allowed_tags:
+            return ""
+
+        if slash:
+            return f"</{tag}>"
+
+        cleaned_attrs = ""
+
+        # Only keep safe color style, e.g. style="color: rgb(...)" or style="color: #2563eb"
+        style_match = re.search(r'style\s*=\s*([\'"])(.*?)\1', attrs, flags=re.IGNORECASE | re.DOTALL)
+
+        if style_match:
+            raw_style = style_match.group(2)
+            safe_styles = []
+
+            for part in raw_style.split(";"):
+                if ":" not in part:
+                    continue
+
+                prop, value = part.split(":", 1)
+                prop = prop.strip().lower()
+                value = value.strip()
+
+                if prop in allowed_style_properties:
+                    # Only allow simple color values.
+                    if re.match(r"^(#[0-9a-fA-F]{3,8}|rgb\([0-9,\s]+\)|rgba\([0-9,\s.]+\)|black|blue|red)$", value):
+                        safe_styles.append(f"{prop}: {value}")
+
+            if safe_styles:
+                cleaned_attrs = f' style="{"; ".join(safe_styles)}"'
+
+        return f"<{tag}{cleaned_attrs}>"
+
+    note_html = re.sub(
+        r"<\s*(/)?\s*([a-zA-Z0-9]+)([^>]*)>",
+        clean_tag,
+        note_html
+    )
+
+    return Markup(note_html)
 
 def build_onboarding_state(user):
     profile_complete = is_profile_complete(user)
@@ -254,6 +425,13 @@ def upload():
         if not course_code:
             flash("Please enter a course code.", "danger")
             return redirect(url_for("main.upload"))
+        
+        if not course_exists(course_code):
+            flash(
+                "Course code not found. Please enter a valid course code supported by TAPA.",
+                "danger"
+            )
+            return redirect(url_for("main.upload"))
 
         uploaded_files = request.files.getlist("note_files")
         valid_files = [f for f in uploaded_files if f and f.filename.strip()]
@@ -294,6 +472,12 @@ def upload():
 
         combined_text = combine_extracted_text(file_results)
         combined_filename_text = ", ".join(saved_filenames)
+
+        is_valid_content, validation_message = validate_learning_content(combined_text)
+
+        if not is_valid_content:
+            flash(validation_message, "danger")
+            return redirect(url_for("main.upload"))
 
         new_material = Material(
             user_id=current_user.id,
@@ -496,6 +680,13 @@ def review_material(material_id):
         question_count = safe_question_count(request.form.get("question_count", 5))
         action = request.form.get("action", "save")
 
+        if material.course_code and not course_exists(material.course_code):
+            flash(
+                "This material has an unsupported course code. Please upload again using a valid course code.",
+                "danger"
+            )
+            return redirect(url_for("main.view_material", material_id=material.id))
+
         if not cleaned_text:
             flash("Cleaned extracted text cannot be empty.", "danger")
             return redirect(url_for("main.review_material", material_id=material.id))
@@ -552,6 +743,13 @@ def clean_material_text(material_id):
 
     if not current_text.strip():
         flash("There is no extracted text to clean.", "warning")
+        return redirect(url_for("main.review_material", material_id=material.id))
+    
+    if len(current_text) > MAX_AI_TEXT_LENGTH:
+        flash(
+            f"Your reviewed text is too long for AI cleaning. Please shorten it to {MAX_AI_TEXT_LENGTH:,} characters or less.",
+            "warning"
+        )
         return redirect(url_for("main.review_material", material_id=material.id))
 
     gemini_api_key = current_app.config.get("GEMINI_API_KEY")
@@ -619,6 +817,13 @@ def generate_quiz(material_id):
     
     material = get_user_material_or_404(material_id)
 
+    if material.course_code and not course_exists(material.course_code):
+        flash(
+            "This material has an unsupported course code. Quiz generation is only allowed for valid supported courses.",
+            "danger"
+        )
+        return redirect(url_for("main.view_material", material_id=material.id))
+
     existing_question_count = Question.query.filter_by(material_id=material.id).count()
     confirm_regenerate = request.form.get("confirm_regenerate") == "yes"
 
@@ -629,6 +834,19 @@ def generate_quiz(material_id):
 
     if not source_text:
         flash("This material has no text to generate questions from.", "warning")
+        return redirect(url_for("main.review_material", material_id=material.id))
+    
+    is_valid_content, validation_message = validate_learning_content(source_text)
+
+    if not is_valid_content:
+        flash(validation_message, "danger")
+        return redirect(url_for("main.review_material", material_id=material.id))
+
+    if len(source_text) > MAX_AI_TEXT_LENGTH:
+        flash(
+            f"Your reviewed text is too long for quiz generation. Please shorten it to {MAX_AI_TEXT_LENGTH:,} characters or less.",
+            "warning"
+        )
         return redirect(url_for("main.review_material", material_id=material.id))
 
     gemini_api_key = current_app.config.get("GEMINI_API_KEY")
@@ -1236,7 +1454,8 @@ def material_notes(material_id):
     )
 
     if request.method == "POST":
-        note_text = request.form.get("note_text", "").strip()
+        raw_note_text = request.form.get("note_text", "").strip()
+        note_text = sanitize_note_html(raw_note_text)
         note_color = request.form.get("note_color", "black").strip()
 
         valid_colors = {"black", "blue", "red"}
