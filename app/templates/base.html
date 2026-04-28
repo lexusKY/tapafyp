@@ -16,6 +16,10 @@
                 <a class="nav-link" href="{{ url_for('main.upload') }}">Upload</a>
                 <a class="nav-link" href="{{ url_for('main.history') }}">History</a>
                 <a class="nav-link" href="{{ url_for('main.notes_library') }}">Notes</a>
+
+                {% if current_user.is_admin %}
+                    <a class="nav-link" href="{{ url_for('main.course_style_page') }}">Course Style</a>
+                {% endif %}
             {% endif %}
 
             <a class="nav-link" href="{{ url_for('main.profile') }}">Profile</a>

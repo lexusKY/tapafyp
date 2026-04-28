@@ -24,6 +24,9 @@ class User(db.Model, UserMixin):
     faculty = db.Column(db.String(150), nullable=True)
     year_of_study = db.Column(db.String(30), nullable=True)
 
+    # Admin permission for internal course style tools
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     materials = db.relationship(

@@ -106,6 +106,13 @@ def is_profile_complete(user):
         user.year_of_study
     ])
 
+def require_admin():
+    if not getattr(current_user, "is_admin", False):
+        flash("You do not have permission to access this page.", "danger")
+        return redirect(url_for("main.dashboard"))
+
+    return None
+
 
 def require_complete_profile():
     if not is_profile_complete(current_user):
@@ -1426,12 +1433,20 @@ def profile():
 @main.route("/course-style")
 @login_required
 def course_style_page():
+    admin_redirect = require_admin()
+    if admin_redirect:
+        return admin_redirect
+
     return render_template("course_style.html")
 
 
 @main.route("/generate-style-profile", methods=["POST"])
 @login_required
 def generate_style_profile_route():
+    admin_redirect = require_admin()
+    if admin_redirect:
+        return admin_redirect
+
     course_code = request.form.get("course_code", "").strip().upper()
 
     if not course_code:
