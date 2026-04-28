@@ -1,0 +1,23 @@
+react native
+component
+state
+props
+navigation
+stack navigator
+drawer navigator
+bottom tab
+stylesheet
+view
+text
+image
+button
+flatlist
+useeffect
+usestate
+sqlite
+database
+mobile application
+android
+ios
+typescript
+tsx

@@ -19,6 +19,187 @@ ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "html"}
 VALID_DIFFICULTIES = {"Hot", "Moderate", "Cold", "All"}
 
 MAX_AI_TEXT_LENGTH = 30000
+MIN_COURSE_KEYWORD_MATCHES = 3
+MAX_UNRELATED_SIGNAL_MATCHES = 4
+
+
+def validate_course_relevance(course_code, text):
+    keywords = load_course_keywords(course_code)
+
+    if not keywords:
+        return False, (
+            "This course does not have a keyword validation file yet. "
+            "Please contact the administrator to set up course keywords."
+        )
+
+    lower_text = (text or "").lower()
+
+    matched_keywords = [
+        keyword for keyword in keywords
+        if keyword in lower_text
+    ]
+
+    unrelated_signals = [
+        "manga",
+        "anime",
+        "shueisha",
+        "tankōbon",
+        "weekly shōnen jump",
+        "superhero",
+        "izuku",
+        "midoriya",
+        "all might",
+        "quirk",
+        "villain",
+        "pro hero",
+        "volume cover",
+        "comic",
+        "publisher",
+        "magazine",
+        "film",
+        "video game",
+        "spin-off"
+    ]
+
+    matched_unrelated = [
+        signal for signal in unrelated_signals
+        if signal in lower_text
+    ]
+
+    if len(matched_keywords) < MIN_COURSE_KEYWORD_MATCHES:
+        return False, (
+            "The uploaded material does not appear to match the selected course code. "
+            "Please check the course code or upload the correct lecture material."
+        )
+
+    if len(matched_unrelated) > MAX_UNRELATED_SIGNAL_MATCHES:
+        return False, (
+            "The uploaded material appears to contain unrelated content for the selected course. "
+            "Please upload the correct lecture or study material."
+        )
+
+    return True, ""
+
+def course_exists(course_code):
+    if not course_code:
+        return False
+
+    course_path = os.path.join(
+        current_app.config["PAST_PAPERS_FOLDER"],
+        course_code.upper()
+    )
+
+    return os.path.isdir(course_path)
+
+
+def load_course_keywords(course_code):
+    if not course_code:
+        return []
+
+    keyword_path = os.path.join(
+        current_app.config["PAST_PAPERS_FOLDER"],
+        course_code.upper(),
+        "course_keywords.txt"
+    )
+
+    if not os.path.exists(keyword_path):
+        return []
+
+    with open(keyword_path, "r", encoding="utf-8") as file:
+        keywords = [
+            line.strip().lower()
+            for line in file.readlines()
+            if line.strip()
+        ]
+
+    return keywords
+
+
+def validate_learning_content(text):
+    text = (text or "").strip()
+    lower_text = text.lower()
+
+    if len(text) < 80:
+        return False, "The uploaded file does not contain enough learning content."
+
+    blocked_terms = [
+        "nsfw",
+        "rule34",
+        "porn",
+        "naked",
+        "sex",
+        "fuck",
+        "illegal drug",
+        "how to hack",
+        "how to steal"
+    ]
+
+    for term in blocked_terms:
+        if term in lower_text:
+            return False, (
+                "This file appears to contain unsafe, inappropriate, or non-educational content. "
+                "Please upload valid lecture or study material only."
+            )
+
+    learning_signals = [
+        "chapter",
+        "topic",
+        "lecture",
+        "learning outcome",
+        "objective",
+        "definition",
+        "example",
+        "formula",
+        "theory",
+        "concept",
+        "algorithm",
+        "method",
+        "question",
+        "answer",
+        "summary",
+        "introduction",
+        "reference",
+        "tutorial",
+        "exercise",
+        "component",
+        "database",
+        "function"
+    ]
+
+    signal_count = sum(1 for signal in learning_signals if signal in lower_text)
+
+    if signal_count == 0:
+        return False, (
+            "This file does not look like lecture or study material. "
+            "Please upload educational notes, slides, tutorials, or revision content."
+        )
+
+    return True, ""
+
+
+def validate_course_relevance(course_code, text):
+    keywords = load_course_keywords(course_code)
+
+    if not keywords:
+        return False, (
+            "This course does not have a keyword validation file yet. "
+            "Please contact the administrator to set up course keywords."
+        )
+
+    lower_text = (text or "").lower()
+
+    matched_keywords = [
+        keyword for keyword in keywords
+        if keyword in lower_text
+    ]
+
+    if len(matched_keywords) < MIN_COURSE_KEYWORD_MATCHES:
+        return False, (
+            "The uploaded material does not appear to match the selected course code. "
+            "Please check the course code or upload the correct lecture material."
+        )
+
+    return True, ""
 
 
 def allowed_file(filename):
@@ -479,6 +660,12 @@ def upload():
             flash(validation_message, "danger")
             return redirect(url_for("main.upload"))
 
+        is_relevant_course, course_message = validate_course_relevance(course_code, combined_text)
+
+        if not is_relevant_course:
+            flash(course_message, "danger")
+            return redirect(url_for("main.upload"))
+
         new_material = Material(
             user_id=current_user.id,
             course_code=course_code,
@@ -690,6 +877,21 @@ def review_material(material_id):
         if not cleaned_text:
             flash("Cleaned extracted text cannot be empty.", "danger")
             return redirect(url_for("main.review_material", material_id=material.id))
+        
+        is_valid_content, validation_message = validate_learning_content(cleaned_text)
+
+        if not is_valid_content:
+            flash(validation_message, "danger")
+            return redirect(url_for("main.review_material", material_id=material.id))
+
+        is_relevant_course, course_message = validate_course_relevance(
+            material.course_code,
+            cleaned_text
+        )
+
+        if not is_relevant_course:
+            flash(course_message, "danger")
+            return redirect(url_for("main.review_material", material_id=material.id))
 
         if quiz_difficulty not in VALID_DIFFICULTIES:
             quiz_difficulty = "All"
@@ -836,10 +1038,33 @@ def generate_quiz(material_id):
         flash("This material has no text to generate questions from.", "warning")
         return redirect(url_for("main.review_material", material_id=material.id))
     
+    if material.course_code and not course_exists(material.course_code):
+        flash(
+            "This material has an unsupported course code. Quiz generation is only allowed for valid supported courses.",
+            "danger"
+        )
+        return redirect(url_for("main.view_material", material_id=material.id))
+
     is_valid_content, validation_message = validate_learning_content(source_text)
 
     if not is_valid_content:
         flash(validation_message, "danger")
+        return redirect(url_for("main.review_material", material_id=material.id))
+
+    is_relevant_course, course_message = validate_course_relevance(
+        material.course_code,
+        source_text
+    )
+
+    if not is_relevant_course:
+        flash(course_message, "danger")
+        return redirect(url_for("main.review_material", material_id=material.id))
+
+    if len(source_text) > MAX_AI_TEXT_LENGTH:
+        flash(
+            f"Your reviewed text is too long for quiz generation. Please shorten it to {MAX_AI_TEXT_LENGTH:,} characters or less.",
+            "warning"
+        )
         return redirect(url_for("main.review_material", material_id=material.id))
 
     if len(source_text) > MAX_AI_TEXT_LENGTH:
