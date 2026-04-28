@@ -1,0 +1,140 @@
+{% if onboarding and onboarding.show %}
+<div class="onboarding-card">
+    <div class="onboarding-top">
+        <div>
+            <div class="eyebrow">Getting Started</div>
+            <h3>Complete your TAPA learning flow</h3>
+            <p>
+                Follow these steps to turn your lecture notes into quiz practice and saved revision notes.
+            </p>
+        </div>
+
+        <div class="onboarding-progress-pill">
+            {{ onboarding.completed_count }}/{{ onboarding.total_steps }}
+        </div>
+    </div>
+
+    {% set onboarding_percent = (onboarding.completed_count / onboarding.total_steps * 100) | round(0) %}
+
+    <div class="onboarding-progress-bar">
+        <div class="onboarding-progress-fill"
+             data-width="{{ onboarding_percent }}">
+        </div>
+    </div>
+
+    <div class="onboarding-steps">
+
+        <a href="{{ url_for('main.profile') }}"
+           class="onboarding-step {% if onboarding.profile_complete %}done{% elif onboarding.completed_count == 0 %}current{% endif %}">
+            <span class="onboarding-step-number">
+                {% if onboarding.profile_complete %}✓{% else %}1{% endif %}
+            </span>
+
+            <div class="onboarding-step-content">
+                <strong>Complete student profile</strong>
+                <p>Add your name, student ID, programme, faculty, and study year.</p>
+
+                {% if not onboarding.profile_complete and onboarding.completed_count == 0 %}
+                    <em class="current-step-label">Current step</em>
+                {% endif %}
+            </div>
+        </a>
+
+        <a href="{{ url_for('main.upload') }}"
+           class="onboarding-step {% if onboarding.material_count > 0 %}done{% elif onboarding.profile_complete and onboarding.material_count == 0 %}current{% endif %}">
+            <span class="onboarding-step-number">
+                {% if onboarding.material_count > 0 %}✓{% else %}2{% endif %}
+            </span>
+
+            <div class="onboarding-step-content">
+                <strong>Upload first material</strong>
+                <p>Upload lecture notes or study files for TAPA to extract content.</p>
+
+                {% if onboarding.profile_complete and onboarding.material_count == 0 %}
+                    <em class="current-step-label">Current step</em>
+                {% endif %}
+            </div>
+        </a>
+
+        <div class="onboarding-step {% if onboarding.question_count > 0 %}done{% elif onboarding.material_count > 0 and onboarding.question_count == 0 %}current{% endif %}">
+            <span class="onboarding-step-number">
+                {% if onboarding.question_count > 0 %}✓{% else %}3{% endif %}
+            </span>
+
+            <div class="onboarding-step-content">
+                <strong>Review text and generate quiz</strong>
+                <p>Check extracted text, optionally clean it with AI, then generate MCQs.</p>
+
+                {% if onboarding.material_count > 0 and onboarding.question_count == 0 %}
+                    <em class="current-step-label">Current step</em>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="onboarding-step {% if onboarding.attempt_count > 0 %}done{% elif onboarding.question_count > 0 and onboarding.attempt_count == 0 %}current{% endif %}">
+            <span class="onboarding-step-number">
+                {% if onboarding.attempt_count > 0 %}✓{% else %}4{% endif %}
+            </span>
+
+            <div class="onboarding-step-content">
+                <strong>Complete one quiz attempt</strong>
+                <p>Choose a difficulty level, answer all questions, and review your result.</p>
+
+                {% if onboarding.question_count > 0 and onboarding.attempt_count == 0 %}
+                    <em class="current-step-label">Current step</em>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{{ url_for('main.notes_library') }}"
+           class="onboarding-step {% if onboarding.note_count > 0 %}done{% elif onboarding.attempt_count > 0 and onboarding.note_count == 0 %}current{% endif %}">
+            <span class="onboarding-step-number">
+                {% if onboarding.note_count > 0 %}✓{% else %}5{% endif %}
+            </span>
+
+            <div class="onboarding-step-content">
+                <strong>Create study notes</strong>
+                <p>Write personal notes while reviewing generated questions and explanations.</p>
+
+                {% if onboarding.attempt_count > 0 and onboarding.note_count == 0 %}
+                    <em class="current-step-label">Current step</em>
+                {% endif %}
+            </div>
+        </a>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".onboarding-progress-fill").forEach(function (bar) {
+            const width = bar.getAttribute("data-width") || "0";
+            bar.style.width = width + "%";
+        });
+    });
+</script>
+
+{% elif onboarding and onboarding.completed_count == onboarding.total_steps and not onboarding.complete_hidden %}
+<div class="onboarding-complete-card">
+    <div class="onboarding-complete-badge">🎉</div>
+
+    <div class="onboarding-complete-content">
+        <div class="eyebrow">Flow Completed</div>
+        <h3>Congratulations! You completed your first TAPA learning flow.</h3>
+        <p>
+            You have completed the full revision journey:
+            profile setup, material upload, quiz generation, quiz attempt, and study notes.
+        </p>
+
+        <div class="onboarding-complete-actions">
+            <a href="{{ url_for('main.dismiss_onboarding_complete') }}" class="btn btn-primary">
+                Continue Revising
+            </a>
+
+            <a href="{{ url_for('main.notes_library') }}" class="btn btn-outline-primary">
+                Open Notes
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}

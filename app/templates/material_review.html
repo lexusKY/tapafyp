@@ -22,6 +22,8 @@
         </div>
     </div>
 
+    {% include "components/onboarding_checklist.html" %}
+
     <form method="POST"
           action="{{ url_for('main.review_material', material_id=material.id) }}"
           data-loading="true">
@@ -81,7 +83,7 @@
 
             <div class="review-side">
 
-                <div class="card review-section-card">
+                <div class="card review-section-card quiz-preferences-card">
                     <div class="card-header bg-white">
                         <h5 class="mb-0 fw-semibold">Quiz Preferences</h5>
                     </div>
@@ -150,6 +152,21 @@
                         </div>
 
                     </div>
+                </div>
+                   
+                <!-- end Quiz Preferences card -->
+
+                <div class="review-flow-hint">
+                    <div class="review-flow-line"></div>
+
+                    <div class="review-flow-bubble">
+                        <span class="review-flow-arrow-small">↑</span>
+                        <span>Set preferences first</span>
+                        <span class="review-flow-arrow-double">↓↓</span>
+                        <strong>Then choose an action</strong>
+                    </div>
+
+                    <div class="review-flow-line"></div>
                 </div>
 
                 <div class="card review-section-card">

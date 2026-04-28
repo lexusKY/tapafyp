@@ -113,6 +113,49 @@ def require_complete_profile():
 
     return None
 
+def build_onboarding_state(user):
+    profile_complete = is_profile_complete(user)
+
+    material_count = Material.query.filter_by(user_id=user.id).count()
+
+    question_count = (
+        Question.query
+        .join(Material)
+        .filter(Material.user_id == user.id)
+        .count()
+    )
+
+    attempt_count = (
+        QuizAttempt.query
+        .filter_by(user_id=user.id)
+        .count()
+    )
+
+    note_count = (
+        MaterialNote.query
+        .filter_by(user_id=user.id)
+        .count()
+    )
+
+    completed_count = sum([
+        profile_complete,
+        material_count > 0,
+        question_count > 0,
+        attempt_count > 0,
+        note_count > 0
+    ])
+
+    return {
+        "profile_complete": profile_complete,
+        "material_count": material_count,
+        "question_count": question_count,
+        "attempt_count": attempt_count,
+        "note_count": note_count,
+        "completed_count": completed_count,
+        "total_steps": 5,
+        "show": completed_count < 5,
+        "complete_hidden": session.get("hide_onboarding_complete", False)
+    }
 
 def save_quiz_attempt(material, level, score, total_questions, results, attempt_type="normal", duration_seconds=None):
     attempt = QuizAttempt(
@@ -146,6 +189,11 @@ def save_quiz_attempt(material, level, score, total_questions, results, attempt_
 def index():
     return render_template("index.html")
 
+@main.route("/dismiss-onboarding-complete")
+@login_required
+def dismiss_onboarding_complete():
+    session["hide_onboarding_complete"] = True
+    return redirect(url_for("main.dashboard"))
 
 @main.route("/dashboard")
 @login_required
@@ -175,7 +223,8 @@ def dashboard():
         user=current_user,
         materials=materials,
         total_materials=total_materials,
-        total_questions=total_questions
+        total_questions=total_questions,
+        onboarding=build_onboarding_state(current_user)
     )
 
 
@@ -256,7 +305,10 @@ def upload():
         flash("Lecture files uploaded and extracted successfully. Please review the extracted text before generating quiz.", "success")
         return redirect(url_for("main.review_material", material_id=new_material.id))
 
-    return render_template("upload.html")
+    return render_template(
+        "upload.html",
+        onboarding=build_onboarding_state(current_user)
+    )
 
 
 @main.route("/material/<int:material_id>")
@@ -474,7 +526,11 @@ def review_material(material_id):
         material.cleaned_text = material.extracted_text
         db.session.commit()
 
-    return render_template("material_review.html", material=material)
+    return render_template(
+        "material_review.html",
+        material=material,
+        onboarding=build_onboarding_state(current_user)
+    )
 
 @main.route("/material/<int:material_id>/clean-text", methods=["POST"])
 @login_required
@@ -1332,7 +1388,8 @@ def profile():
         total_questions=total_questions,
         total_attempts=total_attempts,
         recent_materials=recent_materials,
-        recent_attempts=recent_attempts
+        recent_attempts=recent_attempts,
+        onboarding=build_onboarding_state(current_user)
     )
 
 

@@ -6158,3 +6158,899 @@ button.review-action-card {
         font-size: 0.82rem;
     }
 }
+
+/* ============================================================
+   Getting Started Onboarding Checklist
+   ============================================================ */
+
+.onboarding-card {
+    width: 100%;
+    margin: 0 0 22px;
+    padding: 22px;
+    border-radius: var(--r-2xl);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow-card);
+    color: var(--ink-900);
+}
+
+.onboarding-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 14px;
+}
+
+.onboarding-top h3 {
+    margin-bottom: 6px;
+    font-size: 1.25rem;
+    color: var(--ink-900);
+}
+
+.onboarding-top p {
+    margin: 0;
+    color: var(--ink-500);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.onboarding-progress-pill {
+    min-width: 58px;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--v-100);
+    color: var(--v-700);
+    font-weight: 900;
+    flex: 0 0 auto;
+}
+
+.onboarding-progress-bar {
+    height: 9px;
+    overflow: hidden;
+    border-radius: var(--r-pill);
+    background: var(--v-100);
+    margin-bottom: 16px;
+}
+
+.onboarding-progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: var(--r-pill);
+    background: var(--grad-primary);
+    transition: width 320ms var(--ease);
+}
+
+/* Important: auto-fit prevents the steps from becoming super thin */
+.onboarding-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 10px;
+}
+
+.onboarding-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-height: 138px;
+    padding: 14px;
+    border-radius: var(--r-lg);
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    transition:
+        transform 180ms var(--ease),
+        background 180ms var(--ease),
+        border-color 180ms var(--ease),
+        box-shadow 180ms var(--ease);
+}
+
+.onboarding-step:hover {
+    color: inherit;
+    background: var(--v-50);
+    border-color: var(--border-md);
+    transform: translateY(-1px);
+}
+
+.onboarding-step-number {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--v-100);
+    color: var(--v-700);
+    font-size: 0.86rem;
+    font-weight: 900;
+    position: relative;
+    z-index: 2;
+}
+
+.onboarding-step-content {
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+}
+
+.onboarding-step strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--ink-900);
+    font-size: 0.88rem;
+    line-height: 1.25;
+}
+
+.onboarding-step p {
+    margin: 0;
+    color: var(--ink-500);
+    font-size: 0.76rem;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+.onboarding-step.done {
+    background: var(--m-50);
+    border-color: rgba(0, 201, 167, 0.26);
+}
+
+.onboarding-step.done .onboarding-step-number {
+    background: var(--grad-mint);
+    color: #ffffff;
+}
+
+.onboarding-step.done strong {
+    color: var(--m-700);
+}
+
+/* Current step: green highlight, no overlapping badge */
+.onboarding-step.current {
+    background: linear-gradient(
+        135deg,
+        rgba(236, 253, 245, 0.95),
+        rgba(255, 255, 255, 0.98)
+    );
+    border-color: rgba(0, 201, 167, 0.42);
+    box-shadow:
+        0 0 0 4px rgba(0, 201, 167, 0.08),
+        0 14px 32px rgba(0, 201, 167, 0.16);
+    animation: onboardingBreathGreen 2.2s ease-in-out infinite;
+}
+
+.onboarding-step.current .onboarding-step-number {
+    background: var(--grad-mint);
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(0, 201, 167, 0.28);
+}
+
+.onboarding-step.current strong {
+    color: var(--m-700);
+}
+
+.onboarding-step.current::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(0, 201, 167, 0.11) 35%,
+        transparent 70%
+    );
+    transform: translateX(-110%);
+    animation: onboardingShimmerGreen 2.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.current-step-label {
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: var(--r-pill);
+    background: var(--grad-mint);
+    color: #ffffff;
+    font-size: 0.62rem;
+    font-style: normal;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 18px rgba(0, 201, 167, 0.22);
+}
+
+@keyframes onboardingBreathGreen {
+    0%, 100% {
+        transform: translateY(0);
+        box-shadow:
+            0 0 0 4px rgba(0, 201, 167, 0.08),
+            0 14px 32px rgba(0, 201, 167, 0.16);
+    }
+
+    50% {
+        transform: translateY(-2px);
+        box-shadow:
+            0 0 0 7px rgba(0, 201, 167, 0.11),
+            0 18px 38px rgba(0, 201, 167, 0.22);
+    }
+}
+
+@keyframes onboardingShimmerGreen {
+    0% {
+        transform: translateX(-110%);
+    }
+
+    55%, 100% {
+        transform: translateX(110%);
+    }
+}
+
+@media (max-width: 560px) {
+    .onboarding-top {
+        flex-direction: column;
+    }
+
+    .onboarding-step {
+        min-height: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .onboarding-step.current,
+    .onboarding-step.current::before {
+        animation: none;
+    }
+}
+
+/* ============================================================
+   Material Review Guidance Card - Blue Version
+   ============================================================ */
+
+.review-guidance-card {
+    background: linear-gradient(
+        135deg,
+        rgba(239, 246, 255, 0.96),
+        rgba(255, 255, 255, 0.98)
+    ) !important;
+    border: 1.5px solid rgba(96, 165, 250, 0.42) !important;
+    box-shadow:
+        0 0 0 4px rgba(96, 165, 250, 0.08),
+        0 14px 32px rgba(96, 165, 250, 0.12) !important;
+}
+
+.review-guidance-icon {
+    background: linear-gradient(135deg, #60a5fa, #2563eb) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+}
+
+.review-guidance-card strong {
+    color: #1d4ed8 !important;
+}
+
+.review-guidance-card p {
+    color: #1e40af !important;
+}
+
+.review-guidance-card span {
+    color: #2563eb !important;
+    font-weight: 900;
+}
+
+/* ============================================================
+   Quiz Preferences Gentle Attention Highlight
+   ============================================================ */
+
+.quiz-preferences-card {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(108, 92, 231, 0.22);
+    animation: quizPrefsBreath 2.8s ease-in-out infinite;
+}
+
+.quiz-preferences-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(108, 92, 231, 0.06) 38%,
+        transparent 72%
+    );
+    transform: translateX(-110%);
+    animation: quizPrefsShimmer 3.4s ease-in-out infinite;
+}
+
+.quiz-preferences-card .card-header,
+.quiz-preferences-card .card-body {
+    position: relative;
+    z-index: 1;
+}
+
+.quiz-preferences-card .card-header h5::after {
+    content: "Next";
+    display: inline-flex;
+    margin-left: 8px;
+    padding: 4px 8px;
+    border-radius: var(--r-pill);
+    background: var(--v-100);
+    color: var(--v-700);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+@keyframes quizPrefsBreath {
+    0%, 100% {
+        box-shadow:
+            0 1px 3px rgba(108, 92, 231, 0.06),
+            0 10px 26px rgba(108, 92, 231, 0.06);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 4px rgba(108, 92, 231, 0.07),
+            0 16px 34px rgba(108, 92, 231, 0.13);
+    }
+}
+
+@keyframes quizPrefsShimmer {
+    0% {
+        transform: translateX(-110%);
+    }
+
+    55%, 100% {
+        transform: translateX(110%);
+    }
+}
+
+.quiz-preferences-card select:focus,
+.quiz-preferences-card textarea:focus {
+    border-color: var(--v-400);
+    box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .quiz-preferences-card,
+    .quiz-preferences-card::before {
+        animation: none;
+    }
+}
+
+/* ============================================================
+   Save & Generate Quiz Button - Soft Floating Bubbles
+   ============================================================ */
+
+.review-generate-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    border-color: rgba(108, 92, 231, 0.32);
+    background: linear-gradient(
+        135deg,
+        rgba(108, 92, 231, 0.10),
+        rgba(255, 255, 255, 0.96)
+    );
+    transition:
+        transform 180ms var(--ease),
+        border-color 180ms var(--ease),
+        box-shadow 180ms var(--ease),
+        background 180ms var(--ease);
+}
+
+.review-generate-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(108, 92, 231, 0.46);
+    background: linear-gradient(
+        135deg,
+        rgba(108, 92, 231, 0.16),
+        rgba(255, 255, 255, 0.98)
+    );
+    box-shadow:
+        0 0 0 4px rgba(108, 92, 231, 0.08),
+        0 16px 34px rgba(108, 92, 231, 0.16);
+}
+
+/* light sweep */
+.review-generate-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.55) 38%,
+        transparent 72%
+    );
+    transform: translateX(-120%);
+    transition: transform 520ms var(--ease);
+}
+
+.review-generate-card:hover::before {
+    transform: translateX(120%);
+}
+
+/* bubble 1 */
+.review-generate-card::after {
+    content: "";
+    position: absolute;
+    right: 20px;
+    bottom: 14px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    z-index: -1;
+    background: rgba(108, 92, 231, 0.14);
+    animation: generateBubbleFloatOne 4.2s ease-in-out infinite;
+}
+
+/* bubble 2 using icon layer */
+.review-generate-card .review-action-icon {
+    position: relative;
+    z-index: 2;
+}
+
+.review-generate-card .review-action-icon::after {
+    content: "";
+    position: absolute;
+    right: -56px;
+    top: -6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(108, 92, 231, 0.12);
+    animation: generateBubbleFloatTwo 3.6s ease-in-out infinite;
+}
+
+/* keep text above bubbles */
+.review-generate-card > div {
+    position: relative;
+    z-index: 2;
+}
+
+.review-generate-card:hover .review-action-icon {
+    transform: scale(1.04) rotate(-4deg);
+}
+
+@keyframes generateBubbleFloatOne {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.58;
+    }
+
+    50% {
+        transform: translateY(-8px) scale(1.08);
+        opacity: 0.9;
+    }
+}
+
+@keyframes generateBubbleFloatTwo {
+    0%, 100% {
+        transform: translateY(0) translateX(0) scale(1);
+        opacity: 0.45;
+    }
+
+    50% {
+        transform: translateY(7px) translateX(4px) scale(1.12);
+        opacity: 0.82;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .review-generate-card,
+    .review-generate-card::after,
+    .review-generate-card .review-action-icon::after {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* ============================================================
+   Review Page Flow Hint: Preferences -> Actions
+   ============================================================ */
+
+.review-flow-hint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.review-flow-line {
+    flex: 1;
+    height: 1.5px;
+    border-radius: var(--r-pill);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(108, 92, 231, 0.28),
+        transparent
+    );
+}
+
+.review-flow-bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    border-radius: var(--r-pill);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1.5px solid rgba(108, 92, 231, 0.22);
+    color: var(--ink-600);
+    font-size: 0.76rem;
+    font-weight: 800;
+    box-shadow: var(--shadow-card);
+    white-space: nowrap;
+}
+
+.review-flow-bubble strong {
+    color: var(--v-700);
+    font-weight: 900;
+}
+
+.review-flow-arrow-small {
+    color: var(--v-600);
+    font-weight: 900;
+    animation: reviewArrowUp 1.6s ease-in-out infinite;
+}
+
+.review-flow-arrow-double {
+    color: var(--m-700);
+    font-weight: 900;
+    animation: reviewArrowDown 1.3s ease-in-out infinite;
+}
+
+@keyframes reviewArrowUp {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.72;
+    }
+
+    50% {
+        transform: translateY(-3px);
+        opacity: 1;
+    }
+}
+
+@keyframes reviewArrowDown {
+    0%, 100% {
+        transform: translateY(-2px);
+        opacity: 0.72;
+    }
+
+    50% {
+        transform: translateY(3px);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 700px) {
+    .review-flow-bubble {
+        white-space: normal;
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .review-flow-arrow-small,
+    .review-flow-arrow-double {
+        animation: none;
+    }
+}
+
+/* ============================================================
+   Save & Generate Quiz Button - Gentle Pulse
+   ============================================================ */
+
+.review-generate-card {
+    animation: generateCardPulse 2.4s ease-in-out infinite;
+}
+
+.review-generate-card:hover {
+    animation-play-state: paused;
+}
+
+@keyframes generateCardPulse {
+    0%, 100% {
+        box-shadow:
+            0 1px 3px rgba(108, 92, 231, 0.06),
+            0 10px 24px rgba(108, 92, 231, 0.08);
+        border-color: rgba(108, 92, 231, 0.30);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 4px rgba(108, 92, 231, 0.08),
+            0 16px 34px rgba(108, 92, 231, 0.18);
+        border-color: rgba(108, 92, 231, 0.48);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .review-generate-card {
+        animation: none;
+    }
+}
+
+/* ============================================================
+   Material Workspace Generate Quiz Button - Staggered White Bubbles
+   Keeps original button style
+   ============================================================ */
+
+.workspace-generate-btn {
+    position: relative;
+    overflow: visible;
+    isolation: isolate;
+    animation: workspaceGenerateSoftPulse 2.8s ease-in-out infinite;
+}
+
+.workspace-generate-text {
+    position: relative;
+    z-index: 2;
+}
+
+.workspace-bubble {
+    position: absolute;
+    top: -4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+}
+
+/* Left bubble rises first */
+.workspace-bubble.bubble-one {
+    left: 22%;
+    animation: workspaceBubbleOne 2.6s ease-in-out infinite;
+}
+
+/* Middle bubble rises last */
+.workspace-bubble.bubble-two {
+    left: 46%;
+    width: 6px;
+    height: 6px;
+    animation: workspaceBubbleTwo 2.6s ease-in-out infinite;
+}
+
+/* Right bubble rises second */
+.workspace-bubble.bubble-three {
+    left: 70%;
+    width: 7px;
+    height: 7px;
+    animation: workspaceBubbleThree 2.6s ease-in-out infinite;
+}
+
+.workspace-generate-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Order: left bubble -> right bubble -> middle bubble */
+@keyframes workspaceBubbleOne {
+    0% {
+        transform: translateY(0) scale(0.75);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.72;
+    }
+
+    32% {
+        transform: translateY(-19px) scale(1.08);
+        opacity: 0.58;
+    }
+
+    46%, 100% {
+        transform: translateY(-24px) scale(1.12);
+        opacity: 0;
+    }
+}
+
+@keyframes workspaceBubbleThree {
+    0%, 18% {
+        transform: translateY(0) scale(0.7);
+        opacity: 0;
+    }
+
+    28% {
+        opacity: 0.66;
+    }
+
+    52% {
+        transform: translateY(-18px) scale(1.05);
+        opacity: 0.52;
+    }
+
+    66%, 100% {
+        transform: translateY(-23px) scale(1.1);
+        opacity: 0;
+    }
+}
+
+@keyframes workspaceBubbleTwo {
+    0%, 34% {
+        transform: translateY(0) scale(0.65);
+        opacity: 0;
+    }
+
+    44% {
+        opacity: 0.62;
+    }
+
+    68% {
+        transform: translateY(-17px) scale(1.03);
+        opacity: 0.48;
+    }
+
+    82%, 100% {
+        transform: translateY(-22px) scale(1.08);
+        opacity: 0;
+    }
+}
+
+@keyframes workspaceGenerateSoftPulse {
+    0%, 100% {
+        box-shadow:
+            0 8px 22px rgba(108, 92, 231, 0.20);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 4px rgba(255, 255, 255, 0.13),
+            0 14px 30px rgba(108, 92, 231, 0.28);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .workspace-generate-btn,
+    .workspace-bubble {
+        animation: none;
+    }
+}
+
+/* ============================================================
+   Onboarding Completion Congrats Card
+   ============================================================ */
+
+.onboarding-complete-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    margin: 0 0 22px;
+    padding: 24px;
+    border-radius: var(--r-2xl);
+    background: linear-gradient(
+        135deg,
+        rgba(236, 253, 245, 0.98),
+        rgba(255, 255, 255, 0.98)
+    );
+    border: 1.5px solid rgba(0, 201, 167, 0.32);
+    box-shadow:
+        0 0 0 4px rgba(0, 201, 167, 0.06),
+        0 16px 36px rgba(0, 201, 167, 0.14);
+}
+
+.onboarding-complete-card::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -70px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(0, 201, 167, 0.11);
+}
+
+.onboarding-complete-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(0, 201, 167, 0.08) 38%,
+        transparent 72%
+    );
+    transform: translateX(-110%);
+    animation: onboardingCompleteShine 3.4s ease-in-out infinite;
+}
+
+.onboarding-complete-badge {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    background: var(--grad-mint);
+    color: #ffffff;
+    font-size: 1.5rem;
+    box-shadow: 0 12px 26px rgba(0, 201, 167, 0.24);
+    position: relative;
+    z-index: 1;
+    animation: onboardingCompleteBounce 2.4s ease-in-out infinite;
+}
+
+.onboarding-complete-content {
+    position: relative;
+    z-index: 1;
+}
+
+.onboarding-complete-content h3 {
+    margin-bottom: 7px;
+    color: var(--m-700);
+    font-size: 1.22rem;
+}
+
+.onboarding-complete-content p {
+    max-width: 760px;
+    margin: 0;
+    color: var(--ink-600);
+    font-size: 0.9rem;
+    font-weight: 650;
+    line-height: 1.55;
+}
+
+.onboarding-complete-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+@keyframes onboardingCompleteShine {
+    0% {
+        transform: translateX(-110%);
+    }
+
+    55%, 100% {
+        transform: translateX(110%);
+    }
+}
+
+@keyframes onboardingCompleteBounce {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-3px) rotate(-4deg);
+    }
+}
+
+@media (max-width: 560px) {
+    .onboarding-complete-card {
+        flex-direction: column;
+    }
+
+    .onboarding-complete-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .onboarding-complete-card::after,
+    .onboarding-complete-badge {
+        animation: none;
+    }
+}
