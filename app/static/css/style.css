@@ -7054,3 +7054,22 @@ button.review-action-card {
         animation: none;
     }
 }
+
+.profile-password-card {
+    border: 1.5px solid rgba(108, 92, 231, 0.10);
+}
+
+.profile-password-card .card-header h5::after {
+    content: "Secure";
+    display: inline-flex;
+    margin-left: 8px;
+    padding: 4px 8px;
+    border-radius: var(--r-pill);
+    background: var(--v-100);
+    color: var(--v-700);
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    vertical-align: middle;
+}

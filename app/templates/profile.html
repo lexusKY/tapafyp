@@ -82,10 +82,10 @@
                             <div class="col-md-6">
                                 <label class="form-label">Full Name</label>
                                 <input type="text"
-                                    name="full_name"
-                                    class="form-control"
-                                    value="{{ user.full_name or '' }}"
-                                    placeholder="Example: Chua Kek Yang">
+                                       name="full_name"
+                                       class="form-control"
+                                       value="{{ user.full_name or '' }}"
+                                       placeholder="Example: Chua Kek Yang">
                             </div>
 
                             <div class="col-md-6">
@@ -133,6 +133,58 @@
                             </button>
                         </div>
 
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4 profile-password-card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0 fw-semibold">Change Password</h5>
+                </div>
+
+                <div class="card-body p-4">
+                    <p class="text-muted mb-3">
+                        Update your password by entering your current password first.
+                    </p>
+
+                    <form method="POST"
+                          action="{{ url_for('main.change_password') }}"
+                          data-no-loading="true">
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-12">
+                                <label class="form-label">Current Password</label>
+                                <input type="password"
+                                       name="current_password"
+                                       class="form-control"
+                                       placeholder="Enter current password"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">New Password</label>
+                                <input type="password"
+                                       name="new_password"
+                                       class="form-control"
+                                       placeholder="At least 6 characters"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password"
+                                       name="confirm_password"
+                                       class="form-control"
+                                       placeholder="Re-enter new password"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-outline-primary px-4">
+                                Change Password
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

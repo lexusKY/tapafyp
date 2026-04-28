@@ -1,6 +1,7 @@
 import os
 import time
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash, generate_password_hash
 from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, session, Response
 from flask_login import login_required, current_user
 
@@ -1326,6 +1327,35 @@ def delete_attempt(attempt_id):
 
     flash("Quiz attempt has been deleted successfully.", "success")
     return redirect(url_for("main.history"))
+
+@main.route("/profile/change-password", methods=["POST"])
+@login_required
+def change_password():
+    current_password = request.form.get("current_password", "").strip()
+    new_password = request.form.get("new_password", "").strip()
+    confirm_password = request.form.get("confirm_password", "").strip()
+
+    if not current_password or not new_password or not confirm_password:
+        flash("Please fill in all password fields.", "danger")
+        return redirect(url_for("main.profile"))
+
+    if not check_password_hash(current_user.password, current_password):
+        flash("Current password is incorrect.", "danger")
+        return redirect(url_for("main.profile"))
+
+    if new_password != confirm_password:
+        flash("New password and confirmation do not match.", "danger")
+        return redirect(url_for("main.profile"))
+
+    if len(new_password) < 6:
+        flash("New password must be at least 6 characters long.", "danger")
+        return redirect(url_for("main.profile"))
+
+    current_user.password = generate_password_hash(new_password)
+    db.session.commit()
+
+    flash("Password changed successfully.", "success")
+    return redirect(url_for("main.profile"))
 
 
 @main.route("/profile", methods=["GET", "POST"])
