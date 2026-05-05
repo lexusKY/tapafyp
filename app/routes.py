@@ -18,7 +18,7 @@ main = Blueprint("main", __name__)
 ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "html"}
 VALID_DIFFICULTIES = {"Hot", "Moderate", "Cold", "All"}
 
-MAX_AI_TEXT_LENGTH = 30000
+MAX_AI_TEXT_LENGTH = 50000
 MIN_COURSE_KEYWORD_MATCHES = 3
 MAX_UNRELATED_SIGNAL_MATCHES = 4
 
