@@ -192,6 +192,9 @@
         function applyColor(color) {
             editor.focus();
 
+            // Force inline CSS styling instead of <font color="...">
+            document.execCommand("styleWithCSS", false, true);
+
             if (color === "black") {
                 document.execCommand("foreColor", false, "#111827");
             } else if (color === "blue") {
@@ -200,6 +203,7 @@
                 document.execCommand("foreColor", false, "#dc2626");
             }
 
+            hiddenInput.value = editor.innerHTML;
             setActiveButton(color);
         }
 

@@ -1,7 +1,7 @@
 import os
 import time
 import re
-from markupsafe import Markup
+from markupsafe import escape
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import Blueprint, render_template, current_app, request, redirect, url_for, flash, session, Response
@@ -18,7 +18,7 @@ main = Blueprint("main", __name__)
 ALLOWED_EXTENSIONS = {"pdf", "docx", "pptx", "html"}
 VALID_DIFFICULTIES = {"Hot", "Moderate", "Cold", "All"}
 
-MAX_AI_TEXT_LENGTH = 50000
+MAX_AI_TEXT_LENGTH = 70000
 MIN_COURSE_KEYWORD_MATCHES = 3
 MAX_UNRELATED_SIGNAL_MATCHES = 4
 
@@ -388,6 +388,20 @@ def sanitize_note_html(note_html):
 
     allowed_style_properties = {"color"}
 
+    # Convert <font color="...">text</font> into <span style="color: ...">text</span>
+    note_html = re.sub(
+        r'<\s*font[^>]*color\s*=\s*["\']?([^"\'>\s]+)["\']?[^>]*>',
+        lambda m: f'<span style="color: {m.group(1)}">',
+        note_html,
+        flags=re.IGNORECASE
+    )
+    note_html = re.sub(
+        r'<\s*/\s*font\s*>',
+        '</span>',
+        note_html,
+        flags=re.IGNORECASE
+    )
+
     # Remove dangerous blocks completely.
     note_html = re.sub(
         r"<\s*(script|iframe|object|embed|style|link|meta|form|input|button)[^>]*>.*?<\s*/\s*\1\s*>",
@@ -440,8 +454,11 @@ def sanitize_note_html(note_html):
 
         cleaned_attrs = ""
 
-        # Only keep safe color style, e.g. style="color: rgb(...)" or style="color: #2563eb"
-        style_match = re.search(r'style\s*=\s*([\'"])(.*?)\1', attrs, flags=re.IGNORECASE | re.DOTALL)
+        style_match = re.search(
+            r'style\s*=\s*([\'"])(.*?)\1',
+            attrs,
+            flags=re.IGNORECASE | re.DOTALL
+        )
 
         if style_match:
             raw_style = style_match.group(2)
@@ -456,8 +473,11 @@ def sanitize_note_html(note_html):
                 value = value.strip()
 
                 if prop in allowed_style_properties:
-                    # Only allow simple color values.
-                    if re.match(r"^(#[0-9a-fA-F]{3,8}|rgb\([0-9,\s]+\)|rgba\([0-9,\s.]+\)|black|blue|red)$", value):
+                    if re.match(
+                        r"^(#[0-9a-fA-F]{3,8}|rgb\([0-9,\s]+\)|rgba\([0-9,\s.]+\)|black|blue|red)$",
+                        value,
+                        flags=re.IGNORECASE
+                    ):
                         safe_styles.append(f"{prop}: {value}")
 
             if safe_styles:
@@ -471,7 +491,7 @@ def sanitize_note_html(note_html):
         note_html
     )
 
-    return Markup(note_html)
+    return str(note_html)
 
 def build_onboarding_state(user):
     profile_complete = is_profile_complete(user)
